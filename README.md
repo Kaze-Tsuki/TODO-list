@@ -14,7 +14,7 @@ prall First
 swId First 2 3
 add First new nothing 0
 prall First
-setComp First 4 1
+chg First 4 comp 1
 sort First name
 prall First
 sort First cate
@@ -46,7 +46,7 @@ add a new task 1
 cpy a b
 prall b
 chg b 1 name newname
-chg b 1 category newtask
+chg b 1 cate newtask
 chg b 1 comp 0
 chgli b newb
 prall newb

@@ -314,26 +314,28 @@ void cmd_inter()
 
 void cmd_chg()
 {
-    *ss >> *liname >> *type >> *value;
+    *ss >> *liname >> *task_id >> *type >> *value;
     *list_id = find_id_by_name(*li, *liname);
     if (*list_id == -1)
     {
         cout << "Invalid list name\n";
         return;
     }
-    *ss >> *task_id;
     if (*type == "name")
     {
-        (*li)[*list_id].get_task(*task_id - 1)->change_name(*value);
+        (*li)[*list_id].get_task((*task_id) - 1)->change_name(*value);
     }
-    else if (*type == "category")
+    else if (*type == "cate")
     {
-        (*li)[*list_id].get_task(*task_id - 1)->change_category(*value);
+        (*li)[*list_id].get_task((*task_id) - 1)->change_category(*value);
     }
     else if (*type == "comp")
     {
-        bool completed = (*value == "true");
-        (*li)[*list_id].get_task(*task_id - 1)->change_completed(completed);
+        (*li)[*list_id].get_task((*task_id) - 1)->change_completed(*value == "1");
+    }
+    else
+    {
+        cout << "Invalid type\n";
     }
 }
 
@@ -381,6 +383,10 @@ void cmd_rm()
     else if (*type == "list")
     {
         li->erase(li->begin() + *list_id);
+    }
+    else
+    {
+        cout << "Invalid type\n";
     }
 }
 

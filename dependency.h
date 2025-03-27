@@ -15,8 +15,8 @@ public:
     norm_task(const norm_task &t);
     virtual void print();
     virtual void change_completed(bool ncompleted);
-    virtual void change_name(string name);
-    virtual void change_category(string category);
+    virtual void change_name(string& name);
+    virtual void change_category(string& category);
     virtual bool get_completed();
     virtual string get_name();
     virtual string get_category();

@@ -63,12 +63,12 @@ void norm_task::print()
 }
 
 void norm_task::change_completed(bool ncompleted)
-{*this->completed = ncompleted;}
+{*completed = ncompleted;}
 
-void norm_task::change_name(string nname)
+void norm_task::change_name(string& nname)
 {*name = nname;}
 
-void norm_task::change_category(string ncategory)
+void norm_task::change_category(string& ncategory)
 {*category = ncategory;}
 
 bool norm_task::get_completed()
@@ -156,7 +156,7 @@ void list::switch_id(int index1, int index2)
     norm_task *temp = tasks[index1];
     tasks[index1] = tasks[index2];
     tasks[index2] = temp;
-    cout << "Switch " << index1+1 << " and " << index2+1 << " completed\n";
+    // cout << "Switch " << index1+1 << " and " << index2+1 << " completed\n";
 }
 
 void list::rm_taskWid(int index)
