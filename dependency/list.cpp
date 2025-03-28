@@ -161,50 +161,59 @@ list list::filter(const string category)
 
 void list::clear()
 {
-    for (int i = 0; i < tasks->size(); i++)
-        delete tasks->at(i);
-    // tasks->clear();
+    cout << tasks->size() << " tasks deleted\n";
+    while (tasks->size() > 0)
+    {
+        cout << "Deleting " << tasks->back()->get_name() << "\n";
+        delete tasks->back(); // 釋放記憶體
+        tasks->pop_back(); // 移除最後一個元素
+    }
+
 }
 
-list list::operator+(list &l)
+list* list::merge(list &l)
 {
-    list temp(*name); // 創建一個新的 list，名稱與當前 list 相同
+    list* temp = new list(*name + "-" + *l.name);
     
     for (int i = 0; i < tasks->size(); i++)
-        temp.add_task(tasks->at(i)->clone());
+        temp->add_task(tasks->at(i)->clone());
 
     for (int i = 0; i < l.tasks->size(); i++)
-        temp.add_task(l.tasks->at(i)->clone());
+        temp->add_task(l.tasks->at(i)->clone());
 
-    temp.sort("default", true);
+    temp->sort("default", true);
 
     // 使用 `unique` 來標記重複元素
-    auto it = std::unique(temp.tasks->begin(), temp.tasks->end(),
+    auto it = std::unique(temp->tasks->begin(), temp->tasks->end(),
         [](base_task* a, base_task* b) { return *a == *b; });
 
     // 刪除 `unique` 之後剩下的指標（這些指標指向被標記為重複的物件）
-    for (auto iter = it; iter != temp.tasks->end(); ++iter)
+    for (auto iter = it; iter != temp->tasks->end(); ++iter)
         delete *iter; // 釋放記憶體，避免記憶體洩漏
 
     // `erase()` 只移除 vector 內的指標，不會影響未刪除的 task
-    temp.tasks->erase(it, temp.tasks->end());
+    temp->tasks->erase(it, temp->tasks->end());
 
     return temp; // 返回合併後的 list
 }
 
-list list::operator&(list &l)
+list* list::inter(list &l)
 {
-    list temp(*name);
+    list* temp = new list(*name + "-" + *l.name);
     for (int i = 0; i < tasks->size(); i++)
         for (int j = 0; j < l.tasks->size(); j++)
             if (*tasks->at(i) == *l.tasks->at(j))
-                temp.add_task(tasks->at(i)->clone());
+                temp->add_task(tasks->at(i)->clone());
     return temp;
 }
 
 list::~list()
 {
-    clear();
-    delete tasks;
-    delete name;
+    cout << tasks->size() << " tasks deleted\n";
+    while (tasks->size() > 0)
+    {
+        cout << "Deleting " << tasks->back()->get_name() << "\n";
+        delete tasks->back(); // 釋放記憶體
+        tasks->pop_back(); // 移除最後一個元素
+    }
 }

@@ -246,7 +246,8 @@ void cmd_merge()
         cout << "List name already exists\n";
         return;
     }
-    li->push_back(list(name, (*li)[*index1] + (*li)[*index2]));
+    li->push_back(*(*li)[*index1].merge((*li)[*index2]));
+    li->back().change_name(name);
     cout << "merged list id: " << li->size() - 1 << '\n';
 }
 
@@ -266,7 +267,8 @@ void cmd_inter()
         cout << "List name already exists\n";
         return;
     }
-    li->push_back(list(name, (*li)[*index1] & (*li)[*index2]));
+    li->push_back(*(*li)[*index1].inter((*li)[*index2]));
+    li->back().change_name(name);
     cout << "intersected list id: " << li->size() - 1 << '\n';
 }
 
@@ -340,7 +342,6 @@ void cmd_rm()
     }
     else if (*type == "list")
     {
-        (*li)[*list_id].~list();
         li->erase(li->begin() + *list_id);
     }
     else

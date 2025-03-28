@@ -61,8 +61,8 @@ public:
     void sort(const string type, const bool ascending);
     list filter(const string category);
     void clear();
-    list operator+(list &l);
-    list operator&(list &l);
+    list* merge(list &l);
+    list* inter(list &l);
 
     ~list();
 };
