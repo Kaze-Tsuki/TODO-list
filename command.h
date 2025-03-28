@@ -1,14 +1,15 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include <vector>
+#include <list> // 改為使用 std::list
+#include <algorithm> // For std::find_if
 #include <map>
 #include "dependency/dependency.h"
 
 using namespace std;
 
 // Global variables
-vector<list> *li;           // 全域指標變數，儲存所有清單
+list<todos> *li;             // 全域指標變數，儲存所有清單
 stringstream *ss;           // 全域指標變數，用於解析輸入
 string *cmd;                // 全域指標變數，儲存當前指令
 string *liname;             // 全域指標變數，儲存清單名稱
@@ -41,16 +42,17 @@ void cmd_clear();
 void cmd_ls();
 void processor(string& cmd);
 
-int find_id_by_name(vector<list> &li, string &name)
+int find_id_by_name(list<todos> &li, string &name)
 {
-    for (int i = 0; i < li.size(); i++)
+    int id = 0;
+    for (auto &l : li)
     {
-        if (li[i].get_name() == name)
-            return i;
+        if (l.get_name() == name)
+            return id;
+        id++;
     }
     return -1;
 }
-
 
 void processor(string& cmd)
 {
@@ -62,7 +64,7 @@ void processor(string& cmd)
     {
         cmd_help();
     }
-    else if (cmd == "build_li")
+    else if (cmd == "build_li" || cmd == "bui")
     {
         cmd_build_li();
     }
@@ -151,147 +153,163 @@ void cmd_help()
 void cmd_build_li()
 {
     *ss >> *name;
-    if (find_id_by_name(*li, *name) != -1)
+    for (auto &l : *li)
     {
-        cout << "List name already exists\n";
-        return;
+        if (l.get_name() == *name)
+        {
+            cout << "List name already exists\n";
+            return;
+        }
     }
-    li->push_back(list(*name));
-    cout << "built list " << *name << " id: " << li->size() - 1 << '\n';
+    li->push_back(todos(*name));
+    cout << "built list " << *name << '\n';
 }
 
 void cmd_add()
 {
     *ss >> *liname;
-    *list_id = find_id_by_name(*li, *liname);
-    if (*list_id == -1)
+    auto it = find_if(li->begin(), li->end(), [&](todos &l) { return l.get_name() == *liname; });
+    if (it == li->end())
     {
         cout << "Invalid list name\n";
         return;
     }
-    *ss >> *name >> *category >> *completed;
-    (*li)[*list_id].add_task(new norm_task(*name, *category, *completed));
+    while (*ss >> *name)
+    {
+        *ss >> *category >> *completed;
+        it->add_task(new norm_task(*name, *category, *completed));
+    }
 }
 
 void cmd_pr()
 {
     *ss >> *liname;
-    *list_id = find_id_by_name(*li, *liname);
-    if (*list_id == -1)
+    auto it = find_if(li->begin(), li->end(), [&](todos &l) { return l.get_name() == *liname; });
+    if (it == li->end())
     {
         cout << "Invalid list name\n";
         return;
     }
     *ss >> *task_id;
-    (*li)[*list_id].printtask(*task_id - 1);
+    it->printtask(*task_id - 1);
 }
 
 void cmd_prall()
 {
-    *ss >> *liname;
-    *list_id = find_id_by_name(*li, *liname);
-    if (*list_id == -1)
+    while(*ss >> *liname)
     {
-        cout << "Invalid list name\n";
-        return;
+        auto it = find_if(li->begin(), li->end(), [&](todos &l) { return l.get_name() == *liname; });
+        if (it == li->end())
+        {
+            cout << "Invalid list name\n";
+            return;
+        }
+        it->printAll();
     }
-    (*li)[*list_id].printAll();
 }
 
 void cmd_swId()
 {
     *ss >> *liname;
-    *list_id = find_id_by_name(*li, *liname);
-    if (*list_id == -1)
+    auto it = find_if(li->begin(), li->end(), [&](todos &l) { return l.get_name() == *liname; });
+    if (it == li->end())
     {
         cout << "Invalid list name\n";
         return;
     }
     *ss >> *index1 >> *index2;
-    (*li)[*list_id].switch_id(*index1 - 1, *index2 - 1);
+    it->switch_id(*index1 - 1, *index2 - 1);
 }
 
 void cmd_cpy()
 {
     *ss >> *liname >> *name;
-    *list_id = find_id_by_name(*li, *liname);
-    if (*list_id == -1)
+    auto it = find_if(li->begin(), li->end(), [&](todos &l) { return l.get_name() == *liname; });
+    if (it == li->end())
     {
         cout << "Invalid list name\n";
         return;
     }
-    if (find_id_by_name(*li, *name) != -1)
+    for (auto &l : *li)
     {
-        cout << "List name already exists\n";
-        return;
+        if (l.get_name() == *name)
+        {
+            cout << "List name already exists\n";
+            return;
+        }
     }
-    
-    li->push_back(list(name, (*li)[*list_id]));
-    cout << "copied list id: " << li->size() - 1 << '\n';
+    li->push_back(todos(*name, *it));
+    cout << "copied list " << *name << '\n';
 }
 
 void cmd_merge()
 {
     *ss >> *liname >> *name;
-    *index1 = find_id_by_name(*li, *liname);
-    *index2 = find_id_by_name(*li, *name);
-    if (*index1 == -1 || *index2 == -1)
+    auto it1 = find_if(li->begin(), li->end(), [&](todos &l) { return l.get_name() == *liname; });
+    auto it2 = find_if(li->begin(), li->end(), [&](todos &l) { return l.get_name() == *name; });
+    if (it1 == li->end() || it2 == li->end())
     {
         cout << "Invalid list name\n";
         return;
     }
     *ss >> *name;
-    if (find_id_by_name(*li, *name) != -1)
+    for (auto &l : *li)
     {
-        cout << "List name already exists\n";
-        return;
+        if (l.get_name() == *name)
+        {
+            cout << "List name already exists\n";
+            return;
+        }
     }
-    li->push_back(*(*li)[*index1].merge((*li)[*index2]));
+    li->push_back(*(it1->merge(*it2)));
     li->back().change_name(name);
-    cout << "merged list id: " << li->size() - 1 << '\n';
+    cout << "merged list " << *name << '\n';
 }
 
 void cmd_inter()
 {
     *ss >> *liname >> *name;
-    *index1 = find_id_by_name(*li, *liname);
-    *index2 = find_id_by_name(*li, *name);
-    if (*index1 == -1 || *index2 == -1)
+    auto it1 = find_if(li->begin(), li->end(), [&](todos &l) { return l.get_name() == *liname; });
+    auto it2 = find_if(li->begin(), li->end(), [&](todos &l) { return l.get_name() == *name; });
+    if (it1 == li->end() || it2 == li->end())
     {
         cout << "Invalid list name\n";
         return;
     }
     *ss >> *name;
-    if (find_id_by_name(*li, *name) != -1)
+    for (auto &l : *li)
     {
-        cout << "List name already exists\n";
-        return;
+        if (l.get_name() == *name)
+        {
+            cout << "List name already exists\n";
+            return;
+        }
     }
-    li->push_back(*(*li)[*index1].inter((*li)[*index2]));
+    li->push_back(*(it1->inter(*it2)));
     li->back().change_name(name);
-    cout << "intersected list id: " << li->size() - 1 << '\n';
+    cout << "intersected list " << *name << '\n';
 }
 
 void cmd_chg()
 {
     *ss >> *liname >> *task_id >> *type >> *value;
-    *list_id = find_id_by_name(*li, *liname);
-    if (*list_id == -1)
+    auto it = find_if(li->begin(), li->end(), [&](todos &l) { return l.get_name() == *liname; });
+    if (it == li->end())
     {
         cout << "Invalid list name\n";
         return;
     }
     if (*type == "name")
     {
-        (*li)[*list_id].get_task((*task_id) - 1)->change_name(*value);
+        it->get_task(*task_id - 1)->change_name(*value);
     }
     else if (*type == "cate")
     {
-        (*li)[*list_id].get_task((*task_id) - 1)->change_category(*value);
+        it->get_task(*task_id - 1)->change_category(*value);
     }
     else if (*type == "comp")
     {
-        (*li)[*list_id].get_task((*task_id) - 1)->change_completed(*value == "1");
+        it->get_task(*task_id - 1)->change_completed(*value == "1");
     }
     else
     {
@@ -302,47 +320,51 @@ void cmd_chg()
 void cmd_chgli()
 {
     *ss >> *liname >> *name;
-    *list_id = find_id_by_name(*li, *liname);
-    if (*list_id == -1)
+    auto it = find_if(li->begin(), li->end(), [&](todos &l) { return l.get_name() == *liname; });
+    if (it == li->end())
     {
         cout << "Invalid list name\n";
         return;
     }
-    if (find_id_by_name(*li, *name) != -1)
+    for (auto &l : *li)
     {
-        cout << "List name already exists\n";
-        return;
+        if (l.get_name() == *name)
+        {
+            cout << "List name already exists\n";
+            return;
+        }
     }
-    (*li)[*list_id].change_name(name);
+    it->change_name(name);
 }
 
 void cmd_rm()
 {
     *ss >> *liname >> *type;
-    *list_id = find_id_by_name(*li, *liname);
-    if (*list_id == -1)
+    auto it = find_if(li->begin(), li->end(), [&](todos &l) { return l.get_name() == *liname; });
+    if (it == li->end())
     {
         cout << "Invalid list name\n";
         return;
     }
-    if (*type == "id")
+
+    if (*type == "list")
+    {
+        li->erase(it); // 移除清單
+    }
+    else if (*type == "id")
     {
         *ss >> *task_id;
-        (*li)[*list_id].rm_taskWid(*task_id - 1);
+        it->rm_taskWid(*task_id - 1);
     }
     else if (*type == "name")
     {
         *ss >> *value;
-        (*li)[*list_id].rm_taskWname(*value);
+        it->rm_taskWname(*value);
     }
     else if (*type == "cate")
     {
         *ss >> *value;
-        (*li)[*list_id].rm_taskWcate(*value);
-    }
-    else if (*type == "list")
-    {
-        li->erase(li->begin() + *list_id);
+        it->rm_taskWcate(*value);
     }
     else
     {
@@ -353,57 +375,57 @@ void cmd_rm()
 void cmd_sort()
 {
     *ss >> *liname >> *type >> *ascending;
-    *list_id = find_id_by_name(*li, *liname);
-    if (*list_id == -1)
+    auto it = find_if(li->begin(), li->end(), [&](todos &l) { return l.get_name() == *liname; });
+    if (it == li->end())
     {
         cout << "Invalid list name\n";
         return;
     }
-    (*li)[*list_id].sort(*type, *ascending);
+    it->sort(*type, *ascending);
 }
 
 void cmd_filter()
 {
     *ss >> *liname >> *category;
-    *list_id = find_id_by_name(*li, *liname);
-    if (*list_id == -1)
+    auto it = find_if(li->begin(), li->end(), [&](todos &l) { return l.get_name() == *liname; });
+    if (it == li->end())
     {
         cout << "Invalid list name\n";
         return;
     }
-    list temp((*li)[*list_id].filter(*category));
+    todos temp(it->filter(*category));
     temp.printAll();
     li->push_back(temp);
-    cout << "filtered list id: " << li->size() - 1 << '\n';
+    cout << "filtered list " << temp.get_name() << '\n';
 }
 
 void cmd_ls()
 {
-    cout << "List ID\tName\n";
-    for (int i = 0; i < li->size(); i++)
+    cout << "List Name\n";
+    for (auto &l : *li)
     {
-        cout << i << "\t" << (*li)[i].get_name() << '\n';
+        cout << l.get_name() << '\n';
     }
 }
 
 void cmd_clear()
 {
     *ss >> *liname >> *type;
-    *list_id = find_id_by_name(*li, *liname);
-    if (*list_id == -1)
+    auto it = find_if(li->begin(), li->end(), [&](todos &l) { return l.get_name() == *liname; });
+    if (it == li->end())
     {
         cout << "Invalid list name\n";
         return;
     }
     if (*type == "id")
     {
-        (*li)[*list_id].clear();
+        it->clear();
     }
     else if (*type == "all")
     {
-        for (int i = 0; i < li->size(); i++)
+        for (auto &l : *li)
         {
-            (*li)[i].clear();
+            l.clear();
         }
     }
 }

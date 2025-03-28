@@ -22,7 +22,7 @@ int main()
     task_id = new int();
     index1 = new int();
     index2 = new int();
-    li = new vector<list>();
+    li = new list<todos>();
     ss = new stringstream();
 
     while (getline(cin, *cmd))
@@ -35,7 +35,7 @@ int main()
     // Free memory
     for (auto &l : *li)
     {
-        l.~list(); // Clear each list
+        l.~todos(); // Clear each list
     }
     li->clear(); // Clear the vector of lists
     delete li;

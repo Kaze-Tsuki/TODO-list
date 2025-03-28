@@ -4,13 +4,13 @@
 
 using namespace std;
 
-list::list(string name)
+todos::todos(string name)
 {
     this->name = new string(name);
     tasks = new vector<base_task*>;
 }
 
-list::list(const list &l)
+todos::todos(const todos &l)
 {
     name = new string(*l.name);
     tasks = new vector<base_task*>();
@@ -18,26 +18,26 @@ list::list(const list &l)
         tasks->push_back(l.tasks->at(i)->clone());
 }
 
-list::list(string* name, const list &l)
+todos::todos(const string name, const todos &l)
 {
-    this->name = new string(*name);
+    this->name = new string(name);
     tasks = new vector<base_task*>;
     for (int i = 0; i < l.tasks->size(); i++)
         tasks->push_back(l.tasks->at(i)->clone());
 }
 
-string& list::get_name()
+string& todos::get_name()
 {return *name;}
 
-void list::change_name(string* name)
+void todos::change_name(string* name)
 {*this->name = *name;}
 
-void list::add_task(base_task *task)
+void todos::add_task(base_task *task)
 {
     tasks->push_back(task);
 }
 
-base_task* list::get_task(int index)
+base_task* todos::get_task(int index)
 {
     if (index < 0 || index >= tasks->size())
     {
@@ -47,19 +47,19 @@ base_task* list::get_task(int index)
     return tasks->at(index);
 }
 
-void list::printAll()
+void todos::printAll()
 {
     if(tasks->size() == 0)
     {
         cout << "No tasks\n";
         return;
     }
-    cout << "List:" << *name << "\nID:\tName\tCategory\tCompleted\n";
+    cout << "todos:" << *name << "\nID:\tName\tCategory\tCompleted\n";
     for (int i = 0; i < tasks->size(); i++)
         cout << i+1 << ":\t" << *tasks->at(i);
 }
 
-void list::printtask(int id)
+void todos::printtask(int id)
 {
     if (id < 0 || id >= tasks->size())
     {
@@ -70,7 +70,7 @@ void list::printtask(int id)
     cout << id+1 << ":\t" << *(tasks->at(id));
 }
 
-void list::switch_id(int index1, int index2)
+void todos::switch_id(int index1, int index2)
 {
     if(index1 < 0 || index1 >= tasks->size() || index2 < 0 || index2 >= tasks->size())
     {
@@ -81,7 +81,7 @@ void list::switch_id(int index1, int index2)
     // cout << "Switch " << index1+1 << " and " << index2+1 << " completed\n";
 }
 
-void list::rm_taskWid(int index)
+void todos::rm_taskWid(int index)
 {
     if (index < 0 || index >= tasks->size())
     {
@@ -92,7 +92,7 @@ void list::rm_taskWid(int index)
     tasks->erase(tasks->begin() + index);
 }
 
-void list::rm_taskWname(string name)
+void todos::rm_taskWname(string name)
 {
     for (int i = 0; i < tasks->size(); i++)
         if (tasks->at(i)->get_name() == name)
@@ -101,7 +101,7 @@ void list::rm_taskWname(string name)
         }
 }
 
-void list::rm_taskWcate(string category)
+void todos::rm_taskWcate(string category)
 {
     for (int i = 0; i < tasks->size(); i++)
         if (tasks->at(i)->get_category() == category)
@@ -110,7 +110,7 @@ void list::rm_taskWcate(string category)
         }
 }
 
-void list::sort(const string type, const bool ascending)
+void todos::sort(const string type, const bool ascending)
 {
     cout << "Sorting by " << type << " in " << (ascending ? "ascending" : "descending") << " order\n";
 
@@ -149,17 +149,17 @@ void list::sort(const string type, const bool ascending)
     }
 }
 
-list list::filter(const string category)
+todos todos::filter(const string category)
 {
     string name = *this->name + "-" + category;
-    list temp(name);
+    todos temp(name);
     for (int i = 0; i < tasks->size(); i++)
         if (tasks->at(i)->get_category() == category)
             temp.add_task(tasks->at(i)->clone());
     return temp;
 }
 
-void list::clear()
+void todos::clear()
 {
     cout << tasks->size() << " tasks deleted\n";
     while (tasks->size() > 0)
@@ -171,35 +171,28 @@ void list::clear()
 
 }
 
-list* list::merge(list &l)
+todos* todos::merge(todos &l)
 {
-    list* temp = new list(*name + "-" + *l.name);
-    
+    todos* temp = new todos(*name + "-" + *l.name);
     for (int i = 0; i < tasks->size(); i++)
         temp->add_task(tasks->at(i)->clone());
-
     for (int i = 0; i < l.tasks->size(); i++)
         temp->add_task(l.tasks->at(i)->clone());
+    // 去除重複的任務 
+    for (int i = 0; i < temp->tasks->size(); i++)
+        for (int j = i + 1; j < temp->tasks->size(); j++)
+            if (*temp->tasks->at(i) == *temp->tasks->at(j))
+            {
+                delete temp->tasks->at(j);
+                temp->tasks->erase(temp->tasks->begin() + j--);
+            }
 
-    temp->sort("default", true);
-
-    // 使用 `unique` 來標記重複元素
-    auto it = std::unique(temp->tasks->begin(), temp->tasks->end(),
-        [](base_task* a, base_task* b) { return *a == *b; });
-
-    // 刪除 `unique` 之後剩下的指標（這些指標指向被標記為重複的物件）
-    for (auto iter = it; iter != temp->tasks->end(); ++iter)
-        delete *iter; // 釋放記憶體，避免記憶體洩漏
-
-    // `erase()` 只移除 vector 內的指標，不會影響未刪除的 task
-    temp->tasks->erase(it, temp->tasks->end());
-
-    return temp; // 返回合併後的 list
+    return temp; // 返回合併後的 todos
 }
 
-list* list::inter(list &l)
+todos* todos::inter(todos &l)
 {
-    list* temp = new list(*name + "-" + *l.name);
+    todos* temp = new todos(*name + "-" + *l.name);
     for (int i = 0; i < tasks->size(); i++)
         for (int j = 0; j < l.tasks->size(); j++)
             if (*tasks->at(i) == *l.tasks->at(j))
@@ -207,7 +200,7 @@ list* list::inter(list &l)
     return temp;
 }
 
-list::~list()
+todos::~todos()
 {
     cout << tasks->size() << " tasks deleted\n";
     while (tasks->size() > 0)

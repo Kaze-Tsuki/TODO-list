@@ -39,15 +39,15 @@ public:
     virtual base_task* clone() const override;
 };
 
-class list
+class todos
 {
 protected:
     vector <base_task*>* tasks;
     string* name;
 public:
-    list(string name);
-    list(const list &l);
-    list(string* name, const list &l);
+    todos(string name);
+    todos(const todos &l);
+    todos(const string name, const todos &l);
     string& get_name();
     void change_name(string* name);
     void add_task(base_task *task);
@@ -59,10 +59,10 @@ public:
     void rm_taskWname(string name);
     void rm_taskWcate(string category);
     void sort(const string type, const bool ascending);
-    list filter(const string category);
+    todos filter(const string category);
     void clear();
-    list* merge(list &l);
-    list* inter(list &l);
+    todos* merge(todos &l);
+    todos* inter(todos &l);
 
-    ~list();
+    ~todos();
 };

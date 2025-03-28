@@ -50,6 +50,7 @@ chg b 1 cate newtask
 chg b 1 comp 0
 chgli b newb
 prall newb
+rm a list
 ```
 </details>
 
@@ -58,9 +59,8 @@ prall newb
 
 ```
 build_li a
-add a task1 norm 1
-add a task1 norm 0
-add a task2 emer 1
+add a task1 norm 1 task1 norm 0 task2 emer 1
+add a
 cpy a b
 add b task no 0
 merge a b merged
@@ -69,5 +69,8 @@ prall a
 prall b
 prall merged
 prall intersect
+rm a list
+rm b list
+prall merged intersect
 ```
 </details>
