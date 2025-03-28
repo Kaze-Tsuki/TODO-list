@@ -22,6 +22,11 @@ norm_task::norm_task(string name, string category, bool completed) : base_task(n
 norm_task::norm_task(const base_task &t) : base_task(t)
 {}
 
+base_task* norm_task::clone() const
+{
+    return new norm_task(*this);
+}
+
 bool base_task::operator<(base_task &t)
 {
     if (*name < *t.name)

@@ -3,7 +3,6 @@
 #include <sstream>
 #include <vector>
 #include <map>
-#include "dependency/dependency.h"
 #include "command.h"
 
 using namespace std;
@@ -34,10 +33,11 @@ int main()
     }
 
     // Free memory
-    for (int i = 0; i < li->size(); i++)
+    for (auto &l : *li)
     {
-        (*li)[i].~list();
+        l.~list(); // Clear each list
     }
+    li->clear(); // Clear the vector of lists
     delete li;
     delete ss;
     delete cmd;

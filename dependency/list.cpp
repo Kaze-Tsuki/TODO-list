@@ -4,21 +4,18 @@
 
 using namespace std;
 
-list::list()
-{}
-
-list::list(string* name)
+list::list(string name)
 {
-    this->name = new string(*name);
+    this->name = new string(name);
     tasks = new vector<base_task*>;
 }
 
 list::list(const list &l)
 {
     name = new string(*l.name);
-    tasks = new vector<base_task*>;
+    tasks = new vector<base_task*>();
     for (int i = 0; i < l.tasks->size(); i++)
-        tasks->push_back(new base_task(*l.tasks->at(i)));
+        tasks->push_back(l.tasks->at(i)->clone());
 }
 
 list::list(string* name, const list &l)
@@ -26,7 +23,7 @@ list::list(string* name, const list &l)
     this->name = new string(*name);
     tasks = new vector<base_task*>;
     for (int i = 0; i < l.tasks->size(); i++)
-        tasks->push_back(new base_task(*l.tasks->at(i)));
+        tasks->push_back(l.tasks->at(i)->clone());
 }
 
 string& list::get_name()
@@ -41,7 +38,14 @@ void list::add_task(base_task *task)
 }
 
 base_task* list::get_task(int index)
-{return tasks->at(index);}
+{
+    if (index < 0 || index >= tasks->size())
+    {
+        cout << "Invalid ID\n";
+        return nullptr;
+    }
+    return tasks->at(index);
+}
 
 void list::printAll()
 {
@@ -73,10 +77,7 @@ void list::switch_id(int index1, int index2)
         cout << "Invalid ID\n";
         return;
     }
-    base_task *temp = tasks->at(index1);
-    tasks[index1] = tasks[index2];
-    tasks->at(index2) = temp;
-    delete temp;
+    swap(tasks->at(index1), tasks->at(index2));
     // cout << "Switch " << index1+1 << " and " << index2+1 << " completed\n";
 }
 
@@ -151,10 +152,10 @@ void list::sort(const string type, const bool ascending)
 list list::filter(const string category)
 {
     string name = *this->name + "-" + category;
-    list temp(&name);
+    list temp(name);
     for (int i = 0; i < tasks->size(); i++)
         if (tasks->at(i)->get_category() == category)
-            temp.add_task(new base_task(*tasks->at(i)));
+            temp.add_task(tasks->at(i)->clone());
     return temp;
 }
 
@@ -162,43 +163,48 @@ void list::clear()
 {
     for (int i = 0; i < tasks->size(); i++)
         delete tasks->at(i);
-    tasks->clear();
+    // tasks->clear();
 }
 
 list list::operator+(list &l)
 {
-    list temp(name);
+    list temp(*name); // 創建一個新的 list，名稱與當前 list 相同
+    
     for (int i = 0; i < tasks->size(); i++)
-        temp.add_task(new base_task(*tasks->at(i)));
+        temp.add_task(tasks->at(i)->clone());
+
     for (int i = 0; i < l.tasks->size(); i++)
-        temp.add_task(new base_task(*l.tasks->at(i)));
-    // delete repeated tasks
+        temp.add_task(l.tasks->at(i)->clone());
+
     temp.sort("default", true);
-    for (int i = 0; i < temp.tasks->size() - 1; i++)
-        if (*temp.tasks->at(i) == *temp.tasks->at(i + 1))
-        {
-            delete temp.tasks->at(i);
-            temp.tasks->erase(temp.tasks->begin() + i);
-            i--;
-        }
-    return temp;
+
+    // 使用 `unique` 來標記重複元素
+    auto it = std::unique(temp.tasks->begin(), temp.tasks->end(),
+        [](base_task* a, base_task* b) { return *a == *b; });
+
+    // 刪除 `unique` 之後剩下的指標（這些指標指向被標記為重複的物件）
+    for (auto iter = it; iter != temp.tasks->end(); ++iter)
+        delete *iter; // 釋放記憶體，避免記憶體洩漏
+
+    // `erase()` 只移除 vector 內的指標，不會影響未刪除的 task
+    temp.tasks->erase(it, temp.tasks->end());
+
+    return temp; // 返回合併後的 list
 }
 
 list list::operator&(list &l)
 {
-    list temp(name);
+    list temp(*name);
     for (int i = 0; i < tasks->size(); i++)
         for (int j = 0; j < l.tasks->size(); j++)
             if (*tasks->at(i) == *l.tasks->at(j))
-                temp.add_task(new base_task(*tasks->at(i)));
+                temp.add_task(tasks->at(i)->clone());
     return temp;
 }
 
 list::~list()
 {
     clear();
-    for (int i = 0; i < tasks->size(); i++)
-        delete tasks->at(i);
     delete tasks;
     delete name;
 }

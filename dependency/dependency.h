@@ -27,6 +27,7 @@ public:
     bool operator==(base_task &t);
     bool operator!=(base_task &t);
     friend ostream &operator<<(ostream &os, base_task &t);
+    virtual base_task* clone() const = 0; // Pure virtual function for cloning
     virtual ~base_task();
 };
 
@@ -35,6 +36,7 @@ class norm_task : public base_task
 public:
     norm_task(string name, string category, bool completed);
     norm_task(const base_task &t);
+    virtual base_task* clone() const override;
 };
 
 class list
@@ -43,8 +45,7 @@ protected:
     vector <base_task*>* tasks;
     string* name;
 public:
-    list();
-    list(string* name);
+    list(string name);
     list(const list &l);
     list(string* name, const list &l);
     string& get_name();

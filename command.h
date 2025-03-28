@@ -38,6 +38,7 @@ void cmd_rm();
 void cmd_sort();
 void cmd_filter();
 void cmd_clear();
+void cmd_ls();
 void processor(string& cmd);
 
 int find_id_by_name(vector<list> &li, string &name)
@@ -113,6 +114,10 @@ void processor(string& cmd)
     {
         cmd_filter();
     }
+    else if (cmd == "ls")
+    {
+        cmd_ls();
+    }
     else if (cmd == "clear")
     {
         cmd_clear();
@@ -151,7 +156,7 @@ void cmd_build_li()
         cout << "List name already exists\n";
         return;
     }
-    li->push_back(list(name));
+    li->push_back(list(*name));
     cout << "built list " << *name << " id: " << li->size() - 1 << '\n';
 }
 
@@ -335,6 +340,7 @@ void cmd_rm()
     }
     else if (*type == "list")
     {
+        (*li)[*list_id].~list();
         li->erase(li->begin() + *list_id);
     }
     else
@@ -368,6 +374,15 @@ void cmd_filter()
     temp.printAll();
     li->push_back(temp);
     cout << "filtered list id: " << li->size() - 1 << '\n';
+}
+
+void cmd_ls()
+{
+    cout << "List ID\tName\n";
+    for (int i = 0; i < li->size(); i++)
+    {
+        cout << i << "\t" << (*li)[i].get_name() << '\n';
+    }
 }
 
 void cmd_clear()
