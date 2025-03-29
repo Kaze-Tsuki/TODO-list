@@ -15,7 +15,7 @@ todos::todos(const todos &l)
     name = new string(*l.name);
     tasks = new vector<base_task*>();
     for (int i = 0; i < l.tasks->size(); i++)
-        tasks->push_back(l.tasks->at(i)->clone());
+        tasks->emplace_back(l.tasks->at(i)->clone());
 }
 
 todos::todos(const string name, const todos &l)
@@ -23,7 +23,7 @@ todos::todos(const string name, const todos &l)
     this->name = new string(name);
     tasks = new vector<base_task*>;
     for (int i = 0; i < l.tasks->size(); i++)
-        tasks->push_back(l.tasks->at(i)->clone());
+        tasks->emplace_back(l.tasks->at(i)->clone());
 }
 
 string& todos::get_name()
@@ -34,7 +34,7 @@ void todos::change_name(string* name)
 
 void todos::add_task(base_task *task)
 {
-    tasks->push_back(task);
+    tasks->emplace_back(task);
 }
 
 base_task* todos::get_task(int index)

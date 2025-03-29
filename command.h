@@ -5,6 +5,7 @@
 #include <algorithm> // For std::find_if
 #include <map>
 #include "dependency/dependency.h"
+#include "dependency/cmd_set.h"
 
 using namespace std;
 
@@ -22,6 +23,7 @@ bool *ascending;            // 全域指標變數，儲存排序順序
 int *list_id;               // 全域指標變數，儲存清單 ID
 int *task_id;               // 全域指標變數，儲存任務 ID
 int *index1, *index2;       // 全域指標變數，儲存交換任務的索引
+list<CommandCustomizer> *customs;
 
 // Function declarations
 void cmd_help();
@@ -41,15 +43,18 @@ void cmd_filter();
 void cmd_clear();
 void cmd_ls();
 void processor(string& cmd);
+void customize_cmd();
+void execute_cmd();
+void cmd_userdefined();
 
 int find_id_by_name(list<todos> &li, string &name)
 {
-    int id = 0;
+    int* id = new int(0);
     for (auto &l : li)
     {
         if (l.get_name() == name)
-            return id;
-        id++;
+            return *id;
+        (*id)++;
     }
     return -1;
 }
@@ -124,6 +129,18 @@ void processor(string& cmd)
     {
         cmd_clear();
     }
+    else if (cmd == "define")
+    {
+        customize_cmd();
+    }
+    else if (cmd == "exec")
+    {
+        execute_cmd();
+    }
+    else if (cmd == "usercmd")
+    {
+        cmd_userdefined();
+    }
     else
     {
         cout << "Invalid command\n";
@@ -145,8 +162,8 @@ void cmd_help()
          << "rm <list name> <type> <id/name/category>\n"
          << "rm list <list name>\n"
          << "sort <list name> <type> <ascending>\n"
-         << "filter <list name> <category>\n"
-         << "clear <list name> <id/all>\n"
+         << "filter <list name> <category> <new name>\n"
+         << "clear <id/all> <list name>\n"
          << "exit\n";
 }
 
@@ -161,7 +178,7 @@ void cmd_build_li()
             return;
         }
     }
-    li->push_back(todos(*name));
+    li->emplace_back(*name); // 使用 emplace_back 直接在容器中構造物件
     cout << "built list " << *name << '\n';
 }
 
@@ -238,7 +255,7 @@ void cmd_cpy()
             return;
         }
     }
-    li->push_back(todos(*name, *it));
+    li->emplace_back(*name, *it);
     cout << "copied list " << *name << '\n';
 }
 
@@ -261,7 +278,7 @@ void cmd_merge()
             return;
         }
     }
-    li->push_back(*(it1->merge(*it2)));
+    li->emplace_back(*(it1->merge(*it2)));
     li->back().change_name(name);
     cout << "merged list " << *name << '\n';
 }
@@ -285,7 +302,7 @@ void cmd_inter()
             return;
         }
     }
-    li->push_back(*(it1->inter(*it2)));
+    li->emplace_back(*(it1->inter(*it2)));
     li->back().change_name(name);
     cout << "intersected list " << *name << '\n';
 }
@@ -386,17 +403,16 @@ void cmd_sort()
 
 void cmd_filter()
 {
-    *ss >> *liname >> *category;
+    *ss >> *liname >> *category >> *name;
     auto it = find_if(li->begin(), li->end(), [&](todos &l) { return l.get_name() == *liname; });
     if (it == li->end())
     {
         cout << "Invalid list name\n";
         return;
     }
-    todos temp(it->filter(*category));
-    temp.printAll();
-    li->push_back(temp);
-    cout << "filtered list " << temp.get_name() << '\n';
+    li->emplace_back(it->filter(*category));
+    li->back().change_name(name);
+    cout << "Filtered list " << *liname << '\n';
 }
 
 void cmd_ls()
@@ -410,9 +426,9 @@ void cmd_ls()
 
 void cmd_clear()
 {
-    *ss >> *liname >> *type;
+    *ss >> *type >> *liname;
     auto it = find_if(li->begin(), li->end(), [&](todos &l) { return l.get_name() == *liname; });
-    if (it == li->end())
+    if (it == li->end() && *type != "all")
     {
         cout << "Invalid list name\n";
         return;
@@ -427,5 +443,61 @@ void cmd_clear()
         {
             l.clear();
         }
+    }
+}
+
+void customize_cmd()
+{
+    getline(*ss, *liname);
+    try
+    {
+        customs->emplace_back(*liname); // Use emplace_back to construct in-place
+        cout << "Custom command created\n";
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+}
+
+void execute_cmd()
+{
+    *ss >> *cmd;
+    vector<string> *args = new vector<string>();
+    string *arg = new string();
+    while (*ss >> *arg)
+    {
+        args->push_back(*arg);
+    }
+    try
+    {
+        for (auto &custom : *customs)
+        {
+            if (custom.get_name() == *cmd)
+            {
+                stringstream *result = new stringstream(custom.execute(*args));
+                string *line = new string();
+                while (getline(*result, *line))
+                {
+                    cout << *line << '\n';
+                    processor(*line);
+                }
+                return;
+            }
+        }
+        cout << "Command not found\n";
+    }
+    catch(const std::exception& e)
+    {
+        std::cerr << e.what() << '\n';
+    }
+}
+
+void cmd_userdefined()
+{
+    cout << "custom command Name\n";
+    for (auto &l : *customs)
+    {
+        cout << l.get_name() << ";\tpara: "<< l.get_numParams() << '\n';
     }
 }

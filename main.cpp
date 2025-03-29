@@ -24,12 +24,15 @@ int main()
     index2 = new int();
     li = new list<todos>();
     ss = new stringstream();
+    customs = new list<CommandCustomizer>();
 
     while (getline(cin, *cmd))
     {
         if (*cmd == "exit")
             break;
-        processor(*cmd);
+
+        else
+            processor(*cmd);
     }
 
     // Free memory
@@ -38,6 +41,11 @@ int main()
         l.~todos(); // Clear each list
     }
     li->clear(); // Clear the vector of lists
+    for (auto &custom : *customs)
+    {
+        custom.~CommandCustomizer(); // Clear each custom command
+    }
+    customs->clear(); // Clear the vector of custom commands
     delete li;
     delete ss;
     delete cmd;
