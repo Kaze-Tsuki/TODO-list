@@ -180,17 +180,19 @@ void cmd_help()
 
 void cmd_build_li()
 {
-    *ss >> *name;
-    for (auto &l : *li)
+    while(*ss >> *name)
     {
-        if (l.get_name() == *name)
+        for (auto &l : *li)
         {
-            cout << "List name already exists\n";
-            return;
+            if (l.get_name() == *name)
+            {
+                cout << "List name already exists\n";
+                return;
+            }
         }
+        li->emplace_back(*name); // 使用 emplace_back 直接在容器中構造物件
+        cout << "built list " << *name << '\n';
     }
-    li->emplace_back(*name); // 使用 emplace_back 直接在容器中構造物件
-    cout << "built list " << *name << '\n';
 }
 
 void cmd_add()
@@ -482,7 +484,7 @@ void cmd_clear()
         cout << "Invalid list name\n";
         return;
     }
-    if (*type == "id")
+    if (*type == "list")
     {
         it->clear();
     }
