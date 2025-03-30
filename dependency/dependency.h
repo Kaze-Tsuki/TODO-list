@@ -5,6 +5,9 @@
 
 using namespace std;
 
+#ifndef _TASK_H
+#define _TASK_H
+
 class base_task
 {
 protected:
@@ -22,11 +25,12 @@ public:
     virtual string get_name();
     virtual string get_category();
     
-    bool operator<(base_task &t);
-    bool operator>(base_task &t);
-    bool operator==(base_task &t);
-    bool operator!=(base_task &t);
+    virtual bool operator<(base_task &t) = 0;
+    virtual bool operator>(base_task &t) = 0;
+    virtual bool operator==(base_task &t) = 0;
+    virtual bool operator!=(base_task &t) = 0;
     friend ostream &operator<<(ostream &os, base_task &t);
+    virtual void output(ostream &os) = 0;
     virtual base_task* clone() const = 0; // Pure virtual function for cloning
     virtual ~base_task();
 };
@@ -36,7 +40,33 @@ class norm_task : public base_task
 public:
     norm_task(string name, string category, bool completed);
     norm_task(const base_task &t);
+    virtual bool operator<(base_task &t) override;
+    virtual bool operator>(base_task &t) override;
+    virtual bool operator==(base_task &t) override;
+    virtual bool operator!=(base_task &t) override;
     virtual base_task* clone() const override;
+    virtual void output(ostream &os) override;
+};
+
+class special_task : public base_task
+{
+protected:
+    string *date;
+    int *piority;
+public:
+    special_task(string name, string category, bool completed, string left);
+    special_task(const special_task &t);
+    virtual base_task* clone() const override;
+    virtual bool operator<(base_task &t) override;
+    virtual bool operator>(base_task &t) override;
+    virtual bool operator==(base_task &t) override;
+    virtual bool operator!=(base_task &t) override;
+    void change_date(string& date);
+    void change_piority(int piority);
+    string get_date();
+    int get_piority();
+    ~special_task();
+    virtual void output(ostream &os) override;
 };
 
 class todos
@@ -59,10 +89,12 @@ public:
     void rm_taskWname(string name);
     void rm_taskWcate(string category);
     void sort(const string type, const bool ascending);
-    todos filter(const string category);
+    todos* filter(const string category);
     void clear();
     todos* merge(todos &l);
     todos* inter(todos &l);
 
     ~todos();
 };
+
+#endif // _TASK_H

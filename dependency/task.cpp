@@ -1,5 +1,6 @@
 #include "dependency.h"
 #include <algorithm>
+#include <sstream>
 
 using namespace std;
 
@@ -27,41 +28,11 @@ base_task* norm_task::clone() const
     return new norm_task(*this);
 }
 
-bool base_task::operator<(base_task &t)
-{
-    if (*name < *t.name)
-        return true;
-    if (*name == *t.name && *category < *t.category)
-        return true;
-    if (*name == *t.name && *category == *t.category && *completed < *t.completed)
-        return true;
-    return false;
-}
 
-bool base_task::operator>(base_task &t)
-{
-    if (*name > *t.name)
-        return true;
-    if (*name == *t.name && *category > *t.category)
-        return true;
-    if (*name == *t.name && *category == *t.category && *completed > *t.completed)
-        return true;
-    return false;
-}
-
-bool base_task::operator==(base_task &t)
-{
-    return (*name == *t.name && *category == *t.category && *completed == *t.completed);
-}
-
-bool base_task::operator!=(base_task &t)
-{return !(*this == t);}
 
 ostream &operator<<(ostream &os, base_task &t)
 {
-    os << *t.name << '\t'
-        << *t.category << "\t\t"
-        << ((*t.completed == true)? "Yes" : "No") << "\n";
+    t.output(os);
     return os;
 }
 
@@ -95,4 +66,125 @@ base_task::~base_task()
     delete name;
     delete category;
     delete completed;
+}
+
+bool norm_task::operator<(base_task &t)
+{
+    norm_task* nt = dynamic_cast<norm_task*>(&t);
+    if (nt == nullptr)
+        return false;
+    return *name < *(nt->name);
+}
+
+bool norm_task::operator>(base_task &t)
+{
+    norm_task* nt = dynamic_cast<norm_task*>(&t);
+    if (nt == nullptr)
+        return false;
+    return *name > *(nt->name);
+}
+bool norm_task::operator==(base_task &t)
+{
+    norm_task* nt = dynamic_cast<norm_task*>(&t);
+    if (nt == nullptr)
+        return false;
+    return (*name == *(nt->name) && *category == *(nt->category) && *completed == *(nt->completed));
+}
+bool norm_task::operator!=(base_task &t)
+{
+    norm_task* nt = dynamic_cast<norm_task*>(&t);
+    if (nt == nullptr)
+        return false;
+    return (*name != *(nt->name) || *category != *(nt->category) || *completed != *(nt->completed));
+}
+
+void norm_task::output(ostream &os)
+{
+    os << *name << '\t'
+        << *category << "\t\t"
+        << ((*completed == true)? "Yes" : "No") << "\n";
+}
+
+special_task::special_task(string name, string category, bool completed, string left)
+: base_task(name, category, completed)
+{
+    // parse date=yyyy/mm/dd;piority=p
+    if (left[0] == ';') {
+        date = new string("");
+        piority = new int(stoi(left.substr(1)));
+        return;
+    }
+    // parse =yyyy/mm/dd
+    stringstream *ss = new stringstream(left);
+    string *ldate = new string;
+    string *lpiority = new string;
+    getline(*ss, *ldate, ';');
+    getline(*ss, *lpiority, ';');
+    date = new string(*ldate);
+    if (*lpiority != "")
+        *lpiority = lpiority->substr(lpiority->find('=') + 1);
+    else
+        *lpiority = "0";
+    piority = new int(stoi(*lpiority));
+    delete ss;
+    delete ldate;
+    delete lpiority;
+}
+
+special_task::special_task(const special_task &t) : base_task(t)
+{
+    date = new string(*t.date);
+    piority = new int(*t.piority);
+}
+
+special_task::~special_task()
+{
+    delete date;
+    delete piority;
+}
+base_task* special_task::clone() const
+{
+    return new special_task(*this);
+}
+
+void special_task::change_date(string& ndate)
+{*date = ndate;}
+void special_task::change_piority(int npiority)
+{*piority = npiority;}
+
+string special_task::get_date()
+{return *date;}
+int special_task::get_piority()
+{return *piority;}
+
+bool special_task::operator<(base_task &t)
+{
+    return *name < t.get_name();
+}
+bool special_task::operator>(base_task &t)
+{
+    return *name > t.get_name();
+}
+bool special_task::operator==(base_task &t)
+{
+    special_task* st = dynamic_cast<special_task*>(&t);
+    if (st == nullptr)
+        return false;
+    return (*name == *(st->name) && *category == *(st->category) && *completed == *(st->completed) && *date == *(st->date) && *piority == *(st->piority));
+}
+bool special_task::operator!=(base_task &t)
+{
+    special_task* st = dynamic_cast<special_task*>(&t);
+    if (st == nullptr)
+        return true;
+    return (*name != *(st->name) || *category != *(st->category) || *completed != *(st->completed) || *date != *(st->date) || *piority != *(st->piority));
+}
+
+void special_task::output(ostream &os)
+{
+    os << *name << '\t'
+        << *category << "\t\t"
+        << ((*completed == true)? "Yes" : "No") << "\t\t"
+        << *date << "\t\t"
+        << *piority << "\n";
 }

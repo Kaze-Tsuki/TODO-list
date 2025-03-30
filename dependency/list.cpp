@@ -54,7 +54,7 @@ void todos::printAll()
         cout << "No tasks\n";
         return;
     }
-    cout << "todos:" << *name << "\nID:\tName\tCategory\tCompleted\n";
+    cout << "list: " << *name << "\nID:\tName\tCategory\tCompleted\n";
     for (int i = 0; i < tasks->size(); i++)
         cout << i+1 << ":\t" << *tasks->at(i);
 }
@@ -132,15 +132,50 @@ void todos::sort(const string type, const bool ascending)
             return ascending ? a->get_completed() < b->get_completed() : a->get_completed() > b->get_completed();
         });
     }
+    else if (type == "piority")
+    {
+        std::sort(tasks->begin(), tasks->end(), [ascending](base_task* a, base_task* b) {
+            special_task* st1 = dynamic_cast<special_task*>(a);
+            special_task* st2 = dynamic_cast<special_task*>(b);
+            if (st1 == nullptr)
+                return ascending;
+            if (st2 == nullptr)
+                return !ascending;
+            return ascending ? st1->get_piority() < st2->get_piority() : st1->get_piority() > st2->get_piority();
+        });
+    }
+    else if (type == "date")
+    {
+        std::sort(tasks->begin(), tasks->end(), [ascending](base_task* a, base_task* b) {
+            special_task* st1 = dynamic_cast<special_task*>(a);
+            special_task* st2 = dynamic_cast<special_task*>(b);
+            if (st1 == nullptr)
+                return ascending;
+            if (st2 == nullptr)
+                return !ascending;
+            return ascending ? st1->get_date() < st2->get_date() : st1->get_date() > st2->get_date();
+        });
+    }
     else if (type == "default")
     {
         // name -> category -> completed
         std::sort(tasks->begin(), tasks->end(), [ascending](base_task* a, base_task* b) {
-            if (*a < *b)
-                return ascending;
-            if (*a == *b)
-                return true;
-            return false;
+            if (ascending)
+            {
+                if (*a < *b) return true;
+                else if (*a > *b) return false;
+                else if (a->get_category() < b->get_category()) return true;
+                else if (a->get_category() > b->get_category()) return false;
+                else return a->get_completed() < b->get_completed();
+            }
+            else
+            {
+                if (*a > *b) return true;
+                else if (*a < *b) return false;
+                else if (a->get_category() > b->get_category()) return true;
+                else if (a->get_category() < b->get_category()) return false;
+                else return a->get_completed() > b->get_completed();
+            }
         });
     }
     else
@@ -149,13 +184,12 @@ void todos::sort(const string type, const bool ascending)
     }
 }
 
-todos todos::filter(const string category)
+todos* todos::filter(const string category)
 {
-    string name = *this->name + "-" + category;
-    todos temp(name);
+    todos* temp = new todos(*this->name + "-" + category);
     for (int i = 0; i < tasks->size(); i++)
         if (tasks->at(i)->get_category() == category)
-            temp.add_task(tasks->at(i)->clone());
+            temp->add_task(tasks->at(i)->clone());
     return temp;
 }
 

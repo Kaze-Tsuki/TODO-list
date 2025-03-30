@@ -4,6 +4,7 @@
 #include <list> // 改為使用 std::list
 #include <algorithm> // For std::find_if
 #include <map>
+#include <typeinfo>
 #include "dependency/dependency.h"
 #include "dependency/cmd_set.h"
 
@@ -29,6 +30,7 @@ list<CommandCustomizer> *customs;
 void cmd_help();
 void cmd_build_li();
 void cmd_add();
+void cmd_addsp();
 void cmd_pr();
 void cmd_prall();
 void cmd_swId();
@@ -76,6 +78,10 @@ void processor(string& cmd)
     else if (cmd == "add")
     {
         cmd_add();
+    }
+    else if (cmd == "addsp")
+    {
+        cmd_addsp();
     }
     else if (cmd == "pr")
     {
@@ -196,6 +202,20 @@ void cmd_add()
         *ss >> *category >> *completed;
         it->add_task(new norm_task(*name, *category, *completed));
     }
+}
+
+void cmd_addsp()
+{
+    *ss >> *liname;
+    auto it = find_if(li->begin(), li->end(), [&](todos &l) { return l.get_name() == *liname; });
+    if (it == li->end())
+    {
+        cout << "Invalid list name\n";
+        return;
+    }
+    *ss >> *name >> *category >> *completed >> *value;
+    it->add_task(new special_task(*name, *category, *completed, *value));
+    
 }
 
 void cmd_pr()
@@ -328,6 +348,28 @@ void cmd_chg()
     {
         it->get_task(*task_id - 1)->change_completed(*value == "1");
     }
+    else if (*type == "date")
+    {
+        if (typeid(*it->get_task(*task_id - 1)) == typeid(special_task))
+        {
+            (dynamic_cast<special_task*>(it->get_task(*task_id - 1)))->change_date(*value);
+        }
+        else
+        {
+            cout << "Invalid type\n";
+        }
+    }
+    else if (*type == "piority")
+    {
+        if (typeid(*it->get_task(*task_id - 1)) == typeid(special_task))
+        {
+            (dynamic_cast<special_task*>(it->get_task(*task_id - 1)))->change_piority(stoi(*value));
+        }
+        else
+        {
+            cout << "Invalid type\n";
+        }
+    }
     else
     {
         cout << "Invalid type\n";
@@ -410,7 +452,9 @@ void cmd_filter()
         cout << "Invalid list name\n";
         return;
     }
-    li->emplace_back(it->filter(*category));
+    auto temp = it->filter(*category);
+    li->emplace_back(*temp);
+    delete temp; // 釋放記憶體
     li->back().change_name(name);
     cout << "Filtered list " << *liname << '\n';
 }
