@@ -13,13 +13,15 @@
 
 #### `help` : show all commands
 
-#### `build_li <name>`: create a new list with the given name
+#### `build_li <name>`
+create a new list with the given name
 <details><summary>Support</summary>
 *Enable multi paraments*
 </details>
 
 
-#### `add <name> <task>`: add a new task to the list with the given name.
+#### `add <name> <task>`
+add a new task to the list with the given name.
 
 <details><summary>Support</summary>
 add [li_name] [task]
@@ -29,26 +31,31 @@ add [li_name] [task]
 *Enable multi paraments*
 </details>
 
-#### `addsp <name> <task> <date;piority>`: add a new task to the list with the given name.
+#### `addsp <name> <task> <date;piority>`
+add a new task to the list with the given name.
 
 <details><summary>add special task</summary>
 add [li_name] [task] [date;=piority]
 </details>
 
-#### `pr <list> <id>` : print the task with the given id in the list.
+#### `pr <list> <id>` 
+print the task with the given id in the list.
 
-#### `prall <list>` : print all tasks in the list.
+#### `prall <list>` 
+print all tasks in the list.
 <details><summary>print all tasks</summary>
 prall [list] [list] ...
 
 *Enable multi paraments* 
 </details>
 
-#### `swId <list> <id1> <id2>`: swap the tasks with the given ids in the list.
+#### `swId <list> <id1> <id2>`
+swap the tasks with the given ids in the list.
 
 #### `cpy <list> <new_list>`: copy the list with the given name to a new list.
 
-#### `rm <list> <type> <value>`: remove the tasks in the list with the given type and value.
+#### `rm <list> <type> <value>`
+remove the tasks in the list with the given type and value.
 
 <details><summary>Example</summary>
 rm $list list
@@ -61,29 +68,35 @@ rm $list cate $category
 </details>
 
 
-#### `clear <type> <list name>`: clear the list.
+#### `clear <type> <list name>`
+clear the list.
 <details><summary>Support</summary>
 type = list, all
 
 clear all the tasks without removing the list.
 </details>
 
-#### `chg <list> <id> <type> <value>`: change the task with the given id in the list.
+#### `chg <list> <id> <type> <value>`
+change the task with the given id in the list.
 
-#### `chgli <list> <new name>`: change the list with the given name to a new list.
+#### `chgli <list> <new name>`
+change the list with the given name to a new list.
 
 ### Advanced Commands
 
-#### `sort <list> <type> <order>`: sort the tasks in the list with the given type and order.
+#### `sort <list> <type> <order>`
+sort the tasks in the list with the given type and order.
 <details><summary>Support</summary>
 type = name, cate, comp
 
 order = 0, 1 (if not given, default is 0)
 </details>
 
-#### `filter <list> <type>`: filter the tasks in the list with category.
+#### `filter <list> <type>`
+filter the tasks in the list with category.
 
-#### `merge <list1> <list2> <new_list>`: merge the two lists into a new list.
+#### `merge <list1> <list2> <new_list>`
+merge the two lists into a new list.
 <details><summary>Notice</summary>
 All tasks must be unique in the new list.
 
@@ -94,9 +107,11 @@ All tasks must be unique in the new list.
 *auto sorted*
 </details>
 
-#### `inter <list1> <list2> <new_list>`: intersect the two lists into a new list.
+#### `inter <list1> <list2> <new_list>`
+intersect the two lists into a new list.
 
-#### `define <cmd name> <num of parameters>`: define a new command.
+#### `define <cmd name> <num of parameters>`
+define a new command.
 <details><summary>Example</summary>
 define mycmd 4
 
@@ -113,12 +128,14 @@ end
 **Illegal: add 1 task sleep 1**
 </details>
 
-#### `exec <cmd name>`: execute the command defined by `define`.
+#### `exec <cmd name>`
+execute the command defined by `define`.
 <details><summary>Example</summary>
 exec mycmd a b c d
 </details>
 
-#### `usercmd` : show all user defined commands.
+#### `usercmd` 
+show all user defined commands.
 
 #### `exit` : exit the program.
 
