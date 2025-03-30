@@ -14,16 +14,16 @@ todos::todos(const todos &l)
 {
     name = new string(*l.name);
     tasks = new vector<base_task*>();
-    for (int i = 0; i < l.tasks->size(); i++)
-        tasks->emplace_back(l.tasks->at(i)->clone());
+    for (auto iter = l.tasks->begin(); iter != l.tasks->end(); ++iter)
+        tasks->emplace_back((*iter)->clone());
 }
 
 todos::todos(const string name, const todos &l)
 {
     this->name = new string(name);
     tasks = new vector<base_task*>;
-    for (int i = 0; i < l.tasks->size(); i++)
-        tasks->emplace_back(l.tasks->at(i)->clone());
+    for (auto iter = l.tasks->begin(); iter != l.tasks->end(); ++iter)
+        tasks->emplace_back((*iter)->clone());
 }
 
 string& todos::get_name()
@@ -55,8 +55,10 @@ void todos::printAll()
         return;
     }
     cout << "list: " << *name << "\nID:\tName\tCategory\tCompleted\n";
-    for (int i = 0; i < tasks->size(); i++)
-        cout << i+1 << ":\t" << *tasks->at(i);
+    int* i = new int(0);
+    for (; *i < tasks->size(); (*i)++)
+        cout << (*i)+1 << ":\t" << *tasks->at(*i);
+    delete i;
 }
 
 void todos::printtask(int id)
@@ -94,20 +96,24 @@ void todos::rm_taskWid(int index)
 
 void todos::rm_taskWname(string name)
 {
-    for (int i = 0; i < tasks->size(); i++)
-        if (tasks->at(i)->get_name() == name)
+    int* i = new int (0);
+    for (; *i < tasks->size(); (*i)++)
+        if (tasks->at(*i)->get_name() == name)
         {
-            rm_taskWid(i--);
+            rm_taskWid((*i)--);
         }
+    delete i;
 }
 
 void todos::rm_taskWcate(string category)
 {
-    for (int i = 0; i < tasks->size(); i++)
-        if (tasks->at(i)->get_category() == category)
+    int* i = new int (0);
+    for (; *i < tasks->size(); (*i)++)
+        if (tasks->at(*i)->get_category() == category)
         {
-            rm_taskWid(i--);
+            rm_taskWid((*i)--);
         }
+    delete i;
 }
 
 void todos::sort(const string type, const bool ascending)
@@ -213,12 +219,16 @@ todos* todos::merge(todos &l)
     for (int i = 0; i < l.tasks->size(); i++)
         temp->add_task(l.tasks->at(i)->clone());
     // 去除重複的任務 
-    for (int i = 0; i < temp->tasks->size(); i++)
-        for (int j = i + 1; j < temp->tasks->size(); j++)
-            if (*temp->tasks->at(i) == *temp->tasks->at(j))
+    for (auto it1 = temp->tasks->begin(); it1 != temp->tasks->end(); ++it1)
+        for (auto it2 = it1 + 1; it2 != temp->tasks->end();)
+            if (**it1 == **it2)
             {
-                delete temp->tasks->at(j);
-                temp->tasks->erase(temp->tasks->begin() + j--);
+                delete *it2;
+                it2 = temp->tasks->erase(it2);
+            }
+            else
+            {
+                ++it2;
             }
 
     return temp; // 返回合併後的 todos
@@ -227,10 +237,10 @@ todos* todos::merge(todos &l)
 todos* todos::inter(todos &l)
 {
     todos* temp = new todos(*name + "-" + *l.name);
-    for (int i = 0; i < tasks->size(); i++)
-        for (int j = 0; j < l.tasks->size(); j++)
-            if (*tasks->at(i) == *l.tasks->at(j))
-                temp->add_task(tasks->at(i)->clone());
+    for (auto it1 = tasks->begin(); it1 != tasks->end(); ++it1)
+        for (auto it2 = l.tasks->begin(); it2 != l.tasks->end(); ++it2)
+            if (**it1 == **it2)
+                temp->add_task((*it1)->clone());
     return temp;
 }
 

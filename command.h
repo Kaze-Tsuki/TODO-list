@@ -157,6 +157,7 @@ void cmd_help()
 {
     cout << "build_li (<name>)\n"
          << "add <list name> <name> <category> <completed>\n"
+            << "addsp <list name> <name> <category> <completed> <date;=piority>\n"
          << "pr <list name> <id>\n"
          << "prall <list name>\n"
          << "chg <list name> <id> <name/category> <new value>\n"
@@ -166,10 +167,14 @@ void cmd_help()
          << "merge <list name1> <list name2> <new name>\n"
          << "inter <list name1> <list name2> <new name>\n"
          << "rm <list name> <type> <id/name/category>\n"
-         << "rm list <list name>\n"
+         << "rm <list name> list\n"
          << "sort <list name> <type> <ascending>\n"
          << "filter <list name> <category> <new name>\n"
          << "clear <id/all> <list name>\n"
+         << "ls\n"
+         << "define <command name> <number of parameters>\n"
+         << "exec <command name> <args>\n"
+         << "usercmd\n"
          << "exit\n";
 }
 
@@ -539,6 +544,11 @@ void execute_cmd()
 
 void cmd_userdefined()
 {
+    if (customs->size() == 0)
+    {
+        cout << "No custom command\n";
+        return;
+    }
     cout << "custom command Name\n";
     for (auto &l : *customs)
     {
