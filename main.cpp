@@ -16,7 +16,7 @@ int main()
     category = new string();
     type = new string();
     value = new string();
-    completed = new bool();
+    completed = new string();
     ascending = new bool();
     list_id = new int();
     task_id = new int();
@@ -40,13 +40,14 @@ int main()
     {
         l.~todos(); // Clear each list
     }
-    li->clear(); // Clear the vector of lists
-    for (auto &custom : *customs)
+    li->clear(); // Clear the list of lists
+    while (customs->size() > 0)
     {
-        custom.~CommandCustomizer(); // Clear each custom command
+        customs->erase(customs->begin()); // Clear each custom command
     }
-    customs->clear(); // Clear the vector of custom commands
+    
     delete li;
+    delete customs;
     delete ss;
     delete cmd;
     delete liname;

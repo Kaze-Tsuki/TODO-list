@@ -30,14 +30,14 @@ public:
             ss.clear(); // 清除錯誤狀態
             ss.str(s); // 將字串設置為新的輸入流
             cout << *name << ">>";
-            string command;
+            string command, param;
             ss >> command; // 讀取指令名稱
             vector<int> params;
-            int param;
             while (ss >> param) { // 讀取參數
-                if (param < 1 || param > *numParams) // 檢查參數是否在範圍內
-                    throw invalid_argument("Invalid parameter index: " + to_string(param));
-                params.push_back(param);
+                if (!isdigit(param[0]) || stoi(param) < 1 || stoi(param) > *numParams) // 檢查參數是否在範圍內
+                    throw invalid_argument("Invalid parameter index: " + param);
+                else
+                    params.push_back(stoi(param));
             }
             commandList->emplace_back(command, params); // 儲存指令與參數，保留順序
         }

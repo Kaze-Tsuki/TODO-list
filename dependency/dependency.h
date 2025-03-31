@@ -18,6 +18,7 @@ public:
     base_task(string name, string category, bool completed);
     base_task(const base_task &t);
     virtual void print();
+    virtual string to_commands(string& liname) const = 0;
     virtual void change_completed(bool ncompleted);
     virtual void change_name(string& name);
     virtual void change_category(string& category);
@@ -46,6 +47,7 @@ public:
     virtual bool operator!=(base_task &t) override;
     virtual base_task* clone() const override;
     virtual void output(ostream &os) override;
+    virtual string to_commands(string& liname) const override;
 };
 
 class special_task : public base_task
@@ -67,6 +69,7 @@ public:
     int get_piority();
     ~special_task();
     virtual void output(ostream &os) override;
+    virtual string to_commands(string& liname) const override;
 };
 
 class todos
@@ -89,12 +92,13 @@ public:
     void rm_taskWname(string name);
     void rm_taskWcate(string category);
     void sort(const string type, const bool ascending);
-    todos* filter(const string category);
+    todos* filter(const string type, const string category);
     void clear();
     todos* merge(todos &l);
     todos* inter(todos &l);
+    string to_commands();
 
     ~todos();
 };
 
-#endif // _TASK_H
+#endif

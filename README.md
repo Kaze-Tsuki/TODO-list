@@ -4,18 +4,23 @@
 
 - [Command Summary](#cs)
 - [data structure](#ds)
+- [how to run](#compile)
 - [test cases](#tc)
-- how to run
 
 <h2 id = "cs">Command Summary </h2>
 
 ### Basic Commands
 
-#### `help` : show all commands
+#### `help` 
+show all commands
 
 #### `build_li <name>`
 create a new list with the given name
 <details><summary>Support</summary>
+build_li [name] [name] [name] ...
+
+No format restriction for name.
+
 *Enable multi paraments*
 </details>
 
@@ -35,15 +40,15 @@ add [li_name] [task]
 add a new task to the list with the given name.
 
 <details><summary>add special task</summary>
-add [li_name] [task] [date;=piority]
+add [li_name] [task] [date;piority]
 </details>
 
 #### `pr <list> <id>` 
 print the task with the given id in the list.
 
 #### `prall <list>` 
-print all tasks in the list.
-<details><summary>print all tasks</summary>
+
+<details><summary>print all tasks in the list.</summary>
 prall [list] [list] ...
 
 *Enable multi paraments* 
@@ -52,7 +57,8 @@ prall [list] [list] ...
 #### `swId <list> <id1> <id2>`
 swap the tasks with the given ids in the list.
 
-#### `cpy <list> <new_list>`: copy the list with the given name to a new list.
+#### `cpy <list> <new_list>`
+copy the list with the given name to a new list.
 
 #### `rm <list> <type> <value>`
 remove the tasks in the list with the given type and value.
@@ -92,8 +98,21 @@ type = name, cate, comp
 order = 0, 1 (if not given, default is 0)
 </details>
 
-#### `filter <list> <type>`
+#### `filter <list> <type> <value> <new_list>`
 filter the tasks in the list with category.
+<details><summary>Support</summary>
+type = name, cate, comp, date, piority
+
+comp value = 1(yes), otherwise no
+
+date, piority support compare.
+
+compare value "b" + "the value", like piority b15 or date b2023-10-01.
+
+If not given 'b'(bigger), default is smaller.
+
+new list is optional. If not given, the value will be \<list>-\<value>.
+</details>
 
 #### `merge <list1> <list2> <new_list>`
 merge the two lists into a new list.
@@ -132,10 +151,25 @@ end
 execute the command defined by `define`.
 <details><summary>Example</summary>
 exec mycmd a b c d
+
+**Note**: num of parameters must be the same as defined.
 </details>
 
 #### `usercmd` 
 show all user defined commands.
+
+#### `rmcmd <cmd name>`
+remove the user defined command.
+
+#### `store <file name>`
+store all lists to a file.
+
+*file name don't need .txt end*
+
+#### `load <file name>`
+load all lists from a file.
+
+*file name don't need .txt end*
 
 #### `exit` : exit the program.
 
@@ -145,7 +179,7 @@ show all user defined commands.
 
 Store a list of tasks.
 ```cpp
-struct Todo {
+class Todo {
     string name; // list name
     vector<Task*> tasks; // tasks in the list
 };
@@ -158,7 +192,7 @@ struct Todo {
 
 include all attr of task.
 ```cpp
-struct Task {
+class Task {
     string name; // task name
     string cate;
     int comp;
@@ -172,9 +206,10 @@ struct Task {
 
 `date` Has no restrictions.
 
+`piority` and `date` are attributes of special tasks.
+
 ### List<todo>
 Using list for vector can't store class of pointers.
-[vector iterator validility](https://cplusplus.com/reference/vector/vector/erase/#validity)
 
 I fix the leak bug for 6 hours and find that vector doesn't fit the object, so use list instead.
 
@@ -182,85 +217,151 @@ I fix the leak bug for 6 hours and find that vector doesn't fit the object, so u
 
 combined one command and its following params
 ```cpp
-struct UserCmd {
+class UserCmd {
     vector<pair<string, vector<int>>> commandList; // command and its corresponding params
     string name; // new command name
     int numParams; // num of parameters
 };
 ```
 
+<h2 id = "compile">How to run</h2>
+
+### 📌 依賴需求
+- C++17 以上
+- CMake（Windows 建議安裝 [CMake](https://cmake.org/)）
+- GNU Make（Linux/macOS）
+- MinGW 或 MSVC（Windows）
+
+### Linux/MacOS
+
+```bash
+make clean
+make
+```
+
+### Windows
+
+方法一：使用 CMake
+```shell
+mkdir build
+cd build
+cmake ..
+cmake --build .
+```
+
+```cmake
+cmake_minimum_required(VERSION 3.10)
+project(TODO-list)
+
+set(CMAKE_CXX_STANDARD 17) # 設定 C++ 版本
+
+# 指定包含檔案的目錄 寫在.cpp裡了
+include_directories(./)
+
+# 將 dependency 目錄內的 .cpp 檔案加入
+add_executable(todo 
+    main.cpp 
+    dependency/list.cpp 
+    dependency/task.cpp
+)
+```
+
+方法二：使用mingw-make
+```shell
+mingw32-make
+```
 
 <h2 id = "tc">Test Cases</h2>
 
-<details>
-<summary>basic add/del/view</summary>
+### Basic Commands
 
-```
-build_li First
-add First task1 test 0
-add First task2 test 1
-add First task3 test 0
-prall First
-swId First 2 3
-add First new nothing 0
-prall First
-chg First 4 comp 1
-sort First name
-prall First
-sort First cate
-prall First
-sort First comp 1
-prall First
-sort First name 0
-prall First
-filter First test
-prall First-test
-rm First-test cate test
-rm First name new
-rm First id 4
-prall First
-prall First-test
-rm First list
-add First task again 1
-add First-test task again 1
-prall First-test
-```
+<details><summary>Add View Edit</summary>
+
+bui a b  
+add a task norm 1 task1 norm 0  
+add b task2 norm 0 task3 essential yes  
+prall a b  
+chg a 1 name task4  
+chg a 1 cate essential  
+chg b 1 comp 1  
+chgli a new_name  
+prall a b
 </details>
 
-<details>
-<summary>basic copy/edit</summary>
+<details><summary>Copy Remove Special</summary>
 
-```
-build_li a
-add a new task 1
-cpy a b
-prall b
-chg b 1 name newname
-chg b 1 cate newtask
-chg b 1 comp 0
-chgli b newb
-prall newb
-rm a list
-```
+bui a  
+add a task1 norm 0  
+addsp a task2 norm 0 2023-10-01;1  
+addsp a task3 esse 0 2023-10-02;2  
+cpy a b  
+prall a b  
+rm a id 1  
+rm b cate norm  
+rm a name task2  
+swId b 1 2
+prall a b  
+rm a list  
+prall b a  
 </details>
 
-<details>
-<summary>Advanced merge/intersect</summary>
+### Advanced Commands
 
-```
-build_li a
-add a task1 norm 1 task1 norm 0 task2 emer 1
-add a
-cpy a b
-add b task no 0
-merge a b merged
-inter a b intersect
-prall a
-prall b
-prall merged
-prall intersect
-rm a list
-rm b list
-prall merged intersect
-```
+<details><summary>Store Load</summary>
+
+bui a  
+add a task1 norm 1 task2 norm 0 task3 esse 0  
+addsp a task4 esse 0 2023-10-01;1  
+addsp a task5 esse 1 2023-10-02;2  
+store test  
+***
+(start a new session)  
+load test  
+prall a  
+</details>
+
+<details><summary>Sort Filter</summary>
+
+load test  
+sort a name 0  
+prall a  
+filter a cate esse b  
+prall b  
+sort b piority 1  
+prall b  
+filter a comp 1 c  
+prall c  
+sort a date 0  
+filter a date 2023-10-01 d  
+prall a d  
+</details>
+
+<details><summary>Merge Intersect</summary>
+
+load test  
+bui b  
+add b task1 norm 1 task4 esse 1  
+addsp b task4 esse 0 2023-10-31;3  
+addsp b task5 esse 1 2023-10-02;2  
+store test  
+merge a b c  
+prall c  
+inter a b d  
+prall d  
+</details>
+
+
+<details><summary>Custom Command</summary>
+
+load test  
+define mycmd 4  
+merge 1 2 3  
+inter 1 2 4  
+prall 3 4  
+end  
+exec mycmd a b c d  
+usercmd  
+rmcmd mycmd  
+usercmd  
+exit  
 </details>

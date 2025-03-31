@@ -5,6 +5,7 @@
 #include <algorithm> // For std::find_if
 #include <map>
 #include <typeinfo>
+#include <fstream> // For std::ofstream
 #include "dependency/dependency.h"
 #include "dependency/cmd_set.h"
 
@@ -19,7 +20,7 @@ string *name;               // 全域指標變數，儲存任務名稱或新清�
 string *category;           // 全域指標變數，儲存任務類別
 string *type;               // 全域指標變數，儲存操作類型
 string *value;              // 全域指標變數，儲存操作值
-bool *completed;            // 全域指標變數，儲存任務完成狀態
+string *completed;            // 全域指標變數，儲存任務完成狀態
 bool *ascending;            // 全域指標變數，儲存排序順序
 int *list_id;               // 全域指標變數，儲存清單 ID
 int *task_id;               // 全域指標變數，儲存任務 ID
@@ -45,9 +46,12 @@ void cmd_filter();
 void cmd_clear();
 void cmd_ls();
 void processor(string& cmd);
+void delete_cmd();
 void customize_cmd();
 void execute_cmd();
 void cmd_userdefined();
+void cmd_store();
+void cmd_load();
 
 int find_id_by_name(list<todos> &li, string &name)
 {
@@ -143,9 +147,21 @@ void processor(string& cmd)
     {
         execute_cmd();
     }
+    else if (cmd == "rmcmd")
+    {
+        delete_cmd();
+    }
     else if (cmd == "usercmd")
     {
         cmd_userdefined();
+    }
+    else if (cmd == "store")
+    {
+        cmd_store();
+    }
+    else if (cmd == "load")
+    {
+        cmd_load();
     }
     else
     {
@@ -169,12 +185,14 @@ void cmd_help()
          << "rm <list name> <type> <id/name/category>\n"
          << "rm <list name> list\n"
          << "sort <list name> <type> <ascending>\n"
-         << "filter <list name> <category> <new name>\n"
+         << "filter <list name> <type> <category> <new name>\n"
          << "clear <id/all> <list name>\n"
          << "ls\n"
          << "define <command name> <number of parameters>\n"
          << "exec <command name> <args>\n"
          << "usercmd\n"
+         << "store <filename>\n"
+         << "load <filename>\n"
          << "exit\n";
 }
 
@@ -207,7 +225,7 @@ void cmd_add()
     while (*ss >> *name)
     {
         *ss >> *category >> *completed;
-        it->add_task(new norm_task(*name, *category, *completed));
+        it->add_task(new norm_task(*name, *category, *completed == "1" || *completed == "yes"));
     }
 }
 
@@ -221,7 +239,7 @@ void cmd_addsp()
         return;
     }
     *ss >> *name >> *category >> *completed >> *value;
-    it->add_task(new special_task(*name, *category, *completed, *value));
+    it->add_task(new special_task(*name, *category, *completed == "1" || *completed == "yes", *value));
     
 }
 
@@ -452,17 +470,24 @@ void cmd_sort()
 
 void cmd_filter()
 {
-    *ss >> *liname >> *category >> *name;
+    *name = "";
+    *ss >> *liname >> *type >> *category >> *name;
     auto it = find_if(li->begin(), li->end(), [&](todos &l) { return l.get_name() == *liname; });
     if (it == li->end())
     {
         cout << "Invalid list name\n";
         return;
     }
-    auto temp = it->filter(*category);
+    auto temp = it->filter(*type, *category);
+    if (temp == nullptr)
+    {
+        delete temp;
+        return;
+    }
     li->emplace_back(*temp);
     delete temp; // 釋放記憶體
-    li->back().change_name(name);
+    if (*name != "")
+        li->back().change_name(name);
     cout << "Filtered list " << *liname << '\n';
 }
 
@@ -495,6 +520,18 @@ void cmd_clear()
             l.clear();
         }
     }
+}
+
+void delete_cmd()
+{
+    *ss >> *liname;
+    auto it = find_if(customs->begin(), customs->end(), [&](CommandCustomizer &l) { return l.get_name() == *liname; });
+    if (it == customs->end())
+    {
+        cout << "Invalid command name\n";
+        return;
+    }
+    customs->erase(it); // 移除自定義命令
 }
 
 void customize_cmd()
@@ -556,4 +593,42 @@ void cmd_userdefined()
     {
         cout << l.get_name() << ";\tpara: "<< l.get_numParams() << '\n';
     }
+}
+
+void cmd_store()
+{
+    *ss >> *name;
+    ofstream *file = new ofstream();
+    file->open(*name + ".txt", ios::out | ios::trunc);
+    if (!file->is_open())
+    {
+        cout << "Failed to open file\n";
+        return;
+    }
+    for (auto &l : *li)
+    {
+        *file << l.to_commands();
+    }
+    file->close();
+    delete file;
+}
+
+void cmd_load()
+{
+    *ss >> *name;
+    ifstream *file = new ifstream();
+    file->open(*name + ".txt", ios::in);
+    if (!file->is_open())
+    {
+        cout << "Failed to open file\n";
+        return;
+    }
+    string* line = new string();
+    while (getline(*file, *line))
+    {
+        processor(*line);
+    }
+    file->close();
+    delete file;
+    delete line;
 }

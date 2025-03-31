@@ -105,10 +105,15 @@ void norm_task::output(ostream &os)
         << ((*completed == true)? "Yes" : "No") << "\n";
 }
 
+string norm_task::to_commands(string& liname) const
+{
+    return "add "+ liname+ " " + *name + " " + *category + " " + (*completed == true ? "1" : "0");
+}
+
 special_task::special_task(string name, string category, bool completed, string left)
 : base_task(name, category, completed)
 {
-    // parse date=yyyy/mm/dd;piority=p
+    // parse yyyy/mm/dd;p
     if (left[0] == ';') {
         date = new string("");
         piority = new int(stoi(left.substr(1)));
@@ -121,9 +126,7 @@ special_task::special_task(string name, string category, bool completed, string 
     getline(*ss, *ldate, ';');
     getline(*ss, *lpiority, ';');
     date = new string(*ldate);
-    if (*lpiority != "")
-        *lpiority = lpiority->substr(lpiority->find('=') + 1);
-    else
+    if (*lpiority == "")
         *lpiority = "0";
     piority = new int(stoi(*lpiority));
     delete ss;
@@ -187,4 +190,9 @@ void special_task::output(ostream &os)
         << ((*completed == true)? "Yes" : "No") << "\t\t"
         << *date << "\t\t"
         << *piority << "\n";
+}
+
+string special_task::to_commands(string& liname) const
+{
+    return "addsp "+ liname+ " " + *name + " " + *category + " " + (*completed == true ? "1" : "0") + " " + *date + ";" + to_string(*piority);
 }

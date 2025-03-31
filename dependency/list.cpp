@@ -34,6 +34,14 @@ void todos::change_name(string* name)
 
 void todos::add_task(base_task *task)
 {
+    for (auto &t : *tasks)
+    {
+        if (*t == *task)
+        {
+            cout << "Task already exists\n";
+            return;
+        }
+    }
     tasks->emplace_back(task);
 }
 
@@ -54,8 +62,8 @@ void todos::printAll()
         cout << "No tasks\n";
         return;
     }
-    cout << "list: " << *name << "\nID:\tName\tCategory\tCompleted\n";
-    int* i = new int(0);
+    cout << "list: " << *name << "\nID:\tName\tCategory\tCompleted\tDate\t\t\tPiority\n";
+    size_t* i = new size_t (0);
     for (; *i < tasks->size(); (*i)++)
         cout << (*i)+1 << ":\t" << *tasks->at(*i);
     delete i;
@@ -68,7 +76,11 @@ void todos::printtask(int id)
         cout << "Invalid ID\n";
         return;
     }
-    cout << "ID:\tName\tCategory\tCompleted\n";
+    cout << "ID:\tName\tCategory\tCompleted";
+    if (typeid(*tasks->at(id)) == typeid(special_task))
+        cout << "\tDate\t\t\tPiority\n";
+    else
+        cout << "\n";
     cout << id+1 << ":\t" << *(tasks->at(id));
 }
 
@@ -96,7 +108,7 @@ void todos::rm_taskWid(int index)
 
 void todos::rm_taskWname(string name)
 {
-    int* i = new int (0);
+    size_t* i = new size_t (0);
     for (; *i < tasks->size(); (*i)++)
         if (tasks->at(*i)->get_name() == name)
         {
@@ -107,7 +119,7 @@ void todos::rm_taskWname(string name)
 
 void todos::rm_taskWcate(string category)
 {
-    int* i = new int (0);
+    size_t* i = new size_t (0);
     for (; *i < tasks->size(); (*i)++)
         if (tasks->at(*i)->get_category() == category)
         {
@@ -190,12 +202,76 @@ void todos::sort(const string type, const bool ascending)
     }
 }
 
-todos* todos::filter(const string category)
+todos* todos::filter(const string type, const string category)
 {
     todos* temp = new todos(*this->name + "-" + category);
-    for (int i = 0; i < tasks->size(); i++)
-        if (tasks->at(i)->get_category() == category)
-            temp->add_task(tasks->at(i)->clone());
+    if (type == "cate")
+    {
+        for (auto& task : *tasks)
+            if (task->get_category() == category)
+                temp->add_task(task->clone());
+    }
+    else if (type == "comp")
+    {
+        for (auto& task : *tasks)
+            if (task->get_completed() == (category == "1" || category == "yes"))
+                temp->add_task(task->clone());
+    }
+    else if (type == "name")
+    {
+        for (auto& task : *tasks)
+            if (task->get_name() == category)
+                temp->add_task(task->clone());
+    }
+    else if (type == "date")
+    {
+        bool *bigger = new bool(category[0] == 'b');
+        string *date;
+        if (isdigit(category[0]))
+            date = new string(category);
+        else
+            date = new string(category.substr(1));
+        for (auto& task : *tasks)
+        {
+            special_task* st = dynamic_cast<special_task*>(task);
+            if (st == nullptr)
+                continue;
+            if ((*bigger && st->get_date() > *date) || (!(*bigger) && st->get_date() < *date))
+                temp->add_task(task->clone());
+        }
+        delete bigger;
+        delete date;
+    }
+    else if (type == "piority")
+    {
+        bool *bigger = new bool(category[0] == 'b');
+        int *piority;
+        try{
+            if (isdigit(category[0]))
+                piority = new int(stoi(category));
+            else
+                piority = new int(stoi(category.substr(1)));
+        }
+        catch (const invalid_argument& e) {
+            cout << "invalid argument for piority" << endl;
+            return nullptr;
+        }
+        for (auto& task : *tasks)
+        {
+            special_task* st = dynamic_cast<special_task*>(task);
+            if (st == nullptr)
+                continue;
+            if ((*bigger && st->get_piority() > *piority) || (!(*bigger) && st->get_piority() < *piority))
+                temp->add_task(task->clone());
+        }
+        delete bigger;
+        delete piority;
+    }
+    else
+    {
+        cout << "Invalid type\n";
+        return nullptr;
+    }
     return temp;
 }
 
@@ -214,22 +290,10 @@ void todos::clear()
 todos* todos::merge(todos &l)
 {
     todos* temp = new todos(*name + "-" + *l.name);
-    for (int i = 0; i < tasks->size(); i++)
-        temp->add_task(tasks->at(i)->clone());
-    for (int i = 0; i < l.tasks->size(); i++)
-        temp->add_task(l.tasks->at(i)->clone());
-    // 去除重複的任務 
-    for (auto it1 = temp->tasks->begin(); it1 != temp->tasks->end(); ++it1)
-        for (auto it2 = it1 + 1; it2 != temp->tasks->end();)
-            if (**it1 == **it2)
-            {
-                delete *it2;
-                it2 = temp->tasks->erase(it2);
-            }
-            else
-            {
-                ++it2;
-            }
+    for (auto it1 = tasks->begin(); it1 != tasks->end(); ++it1)
+        temp->add_task((*it1)->clone()); // 複製當前清單的任務
+    for (auto it2 = l.tasks->begin(); it2 != l.tasks->end(); ++it2)
+        temp->add_task((*it2)->clone()); // 複製要合併的清單的任務
 
     return temp; // 返回合併後的 todos
 }
@@ -242,6 +306,17 @@ todos* todos::inter(todos &l)
             if (**it1 == **it2)
                 temp->add_task((*it1)->clone());
     return temp;
+}
+
+string todos::to_commands()
+{
+    static string *s = new string();
+    *s = "bui " + *name + "\n";
+    for (auto &task : *tasks)
+    {
+        *s += task->to_commands(*name) + "\n";
+    }
+    return *s;
 }
 
 todos::~todos()
