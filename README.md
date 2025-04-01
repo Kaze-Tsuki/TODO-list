@@ -1,4 +1,4 @@
-# Instruction of TODO List
+# TODO List
 
 ## Catalog
 
@@ -17,7 +17,6 @@ show all commands
 #### `build_li <name>`
 create a new list with the given name
 <details><summary>Support</summary>
-build_li [name] [name] [name] ...
 
 No format restriction for name.
 
@@ -37,22 +36,15 @@ add [li_name] [task]
 </details>
 
 #### `addsp <name> <task> <date;piority>`
-add a new task to the list with the given name.
-
-<details><summary>add special task</summary>
-add [li_name] [task] [date;piority]
-</details>
+add a new special task to the list with the given name and properties.
 
 #### `pr <list> <id>` 
 print the task with the given id in the list.
 
 #### `prall <list>` 
-
-<details><summary>print all tasks in the list.</summary>
-prall [list] [list] ...
+print all tasks in the list.
 
 *Enable multi paraments* 
-</details>
 
 #### `swId <list> <id1> <id2>`
 swap the tasks with the given ids in the list.
@@ -64,13 +56,14 @@ copy the list with the given name to a new list.
 remove the tasks in the list with the given type and value.
 
 <details><summary>Example</summary>
-rm $list list
 
-rm $list id 1
+rm $list$ list
 
-rm $list name $name
+rm $list$ id $id$
 
-rm $list cate $category
+rm $list$ name $name$
+
+rm $list$ cate $category$
 </details>
 
 

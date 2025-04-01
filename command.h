@@ -563,8 +563,10 @@ void execute_cmd()
         {
             if (custom.get_name() == *cmd)
             {
-                stringstream *result = new stringstream(custom.execute(*args));
-                string *line = new string();
+                string *line = custom.execute(*args);
+                stringstream *result = new stringstream(*line);
+                delete line; // 釋放記憶體
+                line = new string();
                 while (getline(*result, *line))
                 {
                     cout << *line << '\n';
