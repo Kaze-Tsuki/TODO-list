@@ -36,10 +36,6 @@ int main()
     }
 
     // Free memory
-    for (auto &l : *li)
-    {
-        l.~todos(); // Clear each list
-    }
     li->clear(); // Clear the list of lists
     while (customs->size() > 0)
     {

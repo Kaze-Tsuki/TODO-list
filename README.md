@@ -2,7 +2,7 @@
 
 <br>
 <div>
-    <img alt="C++" src="https://img.shields.io/badge/C++-20-%2300599C?logo=cplusplus">
+    <img alt="C++" src="https://img.shields.io/badge/C++-17-%2300599C?logo=cplusplus">
 </div>
 <div>
     <img alt="platform" src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-blueviolet">
@@ -11,8 +11,9 @@
     <img alt="commit" src="https://img.shields.io/github/commit-activity/m/Kaze-Tsuki/TODO-list?color=%23ff69b4">
 </div>
 <div>
-    <img alt="stars" src="https://img.shields.io/github/stars/Kaze-Tsuki/TODO-list?style=social">
-    <img alt="GitHub all releases" src="https://img.shields.io/github/downloads/Kaze-Tsuki/TODO-list/total?style=social">
+    <a href="https://github.com/Kaze-Tsuki/TODO-list">
+    <img alt="Static Badge" src="https://img.shields.io/badge/GitHub-Link-%23B766AD"></a>
+
 </div>
 <br>
 

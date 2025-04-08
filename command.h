@@ -171,7 +171,7 @@ void processor(string& cmd)
 
 void cmd_help()
 {
-    cout << "build_li (<name>)\n"
+    cout << "build_li <name>\n"
          << "add <list name> <name> <category> <completed>\n"
             << "addsp <list name> <name> <category> <completed> <date;=piority>\n"
          << "pr <list name> <id>\n"
@@ -186,7 +186,7 @@ void cmd_help()
          << "rm <list name> list\n"
          << "sort <list name> <type> <ascending>\n"
          << "filter <list name> <type> <category> <new name>\n"
-         << "clear <id/all> <list name>\n"
+         << "clear <list/all> <list name>\n"
          << "ls\n"
          << "define <command name> <number of parameters>\n"
          << "exec <command name> <args>\n"
@@ -326,6 +326,7 @@ void cmd_merge()
     li->emplace_back(*(it1->merge(*it2)));
     li->back().change_name(name);
     cout << "merged list " << *name << '\n';
+    li->back().printAll();
 }
 
 void cmd_inter()
@@ -350,6 +351,7 @@ void cmd_inter()
     li->emplace_back(*(it1->inter(*it2)));
     li->back().change_name(name);
     cout << "intersected list " << *name << '\n';
+    li->back().printAll();
 }
 
 void cmd_chg()
@@ -489,6 +491,7 @@ void cmd_filter()
     if (*name != "")
         li->back().change_name(name);
     cout << "Filtered list " << *liname << '\n';
+    li->back().printAll();
 }
 
 void cmd_ls()
