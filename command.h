@@ -314,6 +314,7 @@ void cmd_merge()
         cout << "Invalid list name\n";
         return;
     }
+    *name = "mer " + *liname + "-" + *name;
     *ss >> *name;
     for (auto &l : *li)
     {
@@ -339,6 +340,7 @@ void cmd_inter()
         cout << "Invalid list name\n";
         return;
     }
+    *name = "int " + *liname + "-" + *name;
     *ss >> *name;
     for (auto &l : *li)
     {

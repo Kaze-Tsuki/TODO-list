@@ -326,10 +326,12 @@ bui a
 add a task1 norm 1 task2 norm 0 task3 esse 0  
 addsp a task4 esse 0 2023-10-01;1  
 addsp a task5 esse 1 2023-10-02;2  
-store test  ```
+store test
+```
 ***
 (start a new session)  
-```load test  
+```
+load test  
 prall a
 ```
 </details>
