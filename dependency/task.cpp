@@ -1,6 +1,7 @@
 #include "dependency.h"
 #include <algorithm>
 #include <sstream>
+#include <memory>
 
 using namespace std;
 
@@ -70,18 +71,12 @@ base_task::~base_task()
 
 bool norm_task::operator<(base_task &t)
 {
-    norm_task* nt = dynamic_cast<norm_task*>(&t);
-    if (nt == nullptr)
-        return false;
-    return *name < *(nt->name);
+    return *name < (t.get_name());
 }
 
 bool norm_task::operator>(base_task &t)
 {
-    norm_task* nt = dynamic_cast<norm_task*>(&t);
-    if (nt == nullptr)
-        return false;
-    return *name > *(nt->name);
+    return *name > (t.get_name());
 }
 bool norm_task::operator==(base_task &t)
 {
@@ -114,24 +109,23 @@ special_task::special_task(string name, string category, bool completed, string 
 : base_task(name, category, completed)
 {
     // parse yyyy/mm/dd;p
-    if (left[0] == ';') {
-        date = new string("");
-        piority = new int(stoi(left.substr(1)));
-        return;
-    }
-    // parse =yyyy/mm/dd
-    stringstream *ss = new stringstream(left);
-    string *ldate = new string;
-    string *lpiority = new string;
+    unique_ptr<stringstream> ss(new stringstream(left));
+    unique_ptr<string> ldate(new string);
+    unique_ptr<string> lpiority(new string);
     getline(*ss, *ldate, ';');
     getline(*ss, *lpiority, ';');
     date = new string(*ldate);
-    if (*lpiority == "")
-        *lpiority = "0";
-    piority = new int(stoi(*lpiority));
-    delete ss;
-    delete ldate;
-    delete lpiority;
+    try {
+        if (*lpiority == "")
+            *lpiority = "0";
+        piority = new int(stoi(*lpiority));
+    } catch (const invalid_argument& e) {
+        cerr << "Invalid argument for lpiority: " << *lpiority << endl;
+        piority = new int(0); // Default to 0 if conversion fails
+    } catch (const out_of_range& e) {
+        cerr << "Out of range value for lpiority: " << *lpiority << endl;
+        piority = new int(0); // Default to 0 if conversion fails
+    }
 }
 
 special_task::special_task(const special_task &t) : base_task(t)

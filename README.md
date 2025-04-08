@@ -1,5 +1,21 @@
 # TODO List
 
+<br>
+<div>
+    <img alt="C++" src="https://img.shields.io/badge/C++-20-%2300599C?logo=cplusplus">
+</div>
+<div>
+    <img alt="platform" src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-blueviolet">
+</div>
+<div>
+    <img alt="commit" src="https://img.shields.io/github/commit-activity/m/Kaze-Tsuki/TODO-list?color=%23ff69b4">
+</div>
+<div>
+    <img alt="stars" src="https://img.shields.io/github/stars/Kaze-Tsuki/TODO-list?style=social">
+    <img alt="GitHub all releases" src="https://img.shields.io/github/downloads/Kaze-Tsuki/TODO-list/total?style=social">
+</div>
+<br>
+
 ## Catalog
 
 - [Command Summary](#cs)
@@ -115,8 +131,6 @@ All tasks must be unique in the new list.
 -> No duplicate tasks in the new list.
 
 -> No tasks will have all same attributes.
-
-*auto sorted*
 </details>
 
 #### `inter <list1> <list2> <new_list>`
@@ -242,6 +256,7 @@ cmake ..
 cmake --build .
 ```
 
+在 workspace 建立一個 CMakeLists.txt，內容如下：
 ```cmake
 cmake_minimum_required(VERSION 3.10)
 project(TODO-list)
@@ -270,7 +285,7 @@ mingw32-make
 
 <details><summary>Add View Edit</summary>
 
-bui a b  
+```bui a b  
 add a task norm 1 task1 norm 0  
 add b task2 norm 0 task3 essential yes  
 prall a b  
@@ -279,11 +294,12 @@ chg a 1 cate essential
 chg b 1 comp 1  
 chgli a new_name  
 prall a b
+```
 </details>
 
 <details><summary>Copy Remove Special</summary>
 
-bui a  
+```bui a  
 add a task1 norm 0  
 addsp a task2 norm 0 2023-10-01;1  
 addsp a task3 esse 0 2023-10-02;2  
@@ -295,27 +311,29 @@ rm a name task2
 swId b 1 2
 prall a b  
 rm a list  
-prall b a  
+prall b a
+```
 </details>
 
 ### Advanced Commands
 
 <details><summary>Store Load</summary>
 
-bui a  
+```bui a  
 add a task1 norm 1 task2 norm 0 task3 esse 0  
 addsp a task4 esse 0 2023-10-01;1  
 addsp a task5 esse 1 2023-10-02;2  
-store test  
+store test  ```
 ***
 (start a new session)  
-load test  
-prall a  
+```load test  
+prall a
+```
 </details>
 
 <details><summary>Sort Filter</summary>
 
-load test  
+```load test  
 sort a name 0  
 prall a  
 filter a cate esse b  
@@ -326,12 +344,13 @@ filter a comp 1 c
 prall c  
 sort a date 0  
 filter a date 2023-10-01 d  
-prall a d  
+prall a d
+```
 </details>
 
 <details><summary>Merge Intersect</summary>
 
-load test  
+```load test  
 bui b  
 add b task1 norm 1 task4 esse 1  
 addsp b task4 esse 0 2023-10-31;3  
@@ -340,13 +359,14 @@ store test
 merge a b c  
 prall c  
 inter a b d  
-prall d  
+prall d
+```
 </details>
 
 
 <details><summary>Custom Command</summary>
 
-load test  
+```load test  
 define mycmd 4  
 merge 1 2 3  
 inter 1 2 4  
@@ -356,5 +376,6 @@ exec mycmd a b c d
 usercmd  
 rmcmd mycmd  
 usercmd  
-exit  
+exit
+```
 </details>
