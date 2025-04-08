@@ -233,12 +233,11 @@ class UserCmd {
 ```
 
 <h2 id = "compile">How to run</h2>
-
-### 📌 依賴需求
-- C++17 以上
-- CMake（Windows 建議安裝 [CMake](https://cmake.org/)）
-- GNU Make（Linux/macOS）
-- MinGW 或 MSVC（Windows）
+### 📌 Dependencies
+- C++17 or later
+- CMake (Recommended for Windows: [CMake](https://cmake.org/))
+- GNU Make (Linux/macOS)
+- MinGW or MSVC (Windows)
 
 ### Linux/MacOS
 
@@ -249,7 +248,7 @@ make
 
 ### Windows
 
-方法一：使用 CMake
+Method 1: use CMake
 ```shell
 mkdir build
 cd build
@@ -257,17 +256,17 @@ cmake ..
 cmake --build .
 ```
 
-在 workspace 建立一個 CMakeLists.txt，內容如下：
+Create a `CMakeLists.txt` file in the workspace with the following content:
 ```cmake
 cmake_minimum_required(VERSION 3.10)
 project(TODO-list)
 
-set(CMAKE_CXX_STANDARD 17) # 設定 C++ 版本
+set(CMAKE_CXX_STANDARD 17) # Set C++ version
 
-# 指定包含檔案的目錄 寫在.cpp裡了
+# Specify the directory for header files (already included in .cpp files)
 include_directories(./)
 
-# 將 dependency 目錄內的 .cpp 檔案加入
+# Add .cpp files from the dependency directory
 add_executable(todo 
     main.cpp 
     dependency/list.cpp 
@@ -275,7 +274,7 @@ add_executable(todo
 )
 ```
 
-方法二：使用mingw-make
+Method 2: Use `mingw-make`
 ```shell
 mingw32-make
 ```
@@ -286,7 +285,8 @@ mingw32-make
 
 <details><summary>Add View Edit</summary>
 
-```bui a b  
+```
+bui a b  
 add a task norm 1 task1 norm 0  
 add b task2 norm 0 task3 essential yes  
 prall a b  
@@ -300,7 +300,8 @@ prall a b
 
 <details><summary>Copy Remove Special</summary>
 
-```bui a  
+```
+bui a  
 add a task1 norm 0  
 addsp a task2 norm 0 2023-10-01;1  
 addsp a task3 esse 0 2023-10-02;2  
@@ -320,7 +321,8 @@ prall b a
 
 <details><summary>Store Load</summary>
 
-```bui a  
+```
+bui a  
 add a task1 norm 1 task2 norm 0 task3 esse 0  
 addsp a task4 esse 0 2023-10-01;1  
 addsp a task5 esse 1 2023-10-02;2  
@@ -334,7 +336,8 @@ prall a
 
 <details><summary>Sort Filter</summary>
 
-```load test  
+```
+load test  
 sort a name 0  
 prall a  
 filter a cate esse b  
@@ -351,7 +354,8 @@ prall a d
 
 <details><summary>Merge Intersect</summary>
 
-```load test  
+```
+load test  
 bui b  
 add b task1 norm 1 task4 esse 1  
 addsp b task4 esse 0 2023-10-31;3  
@@ -367,7 +371,8 @@ prall d
 
 <details><summary>Custom Command</summary>
 
-```load test  
+```
+load test  
 define mycmd 4  
 merge 1 2 3  
 inter 1 2 4  
