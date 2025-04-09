@@ -233,6 +233,7 @@ class UserCmd {
 ```
 
 <h2 id = "compile">How to run</h2>
+
 ### 📌 Dependencies
 - C++17 or later
 - CMake (Recommended for Windows: [CMake](https://cmake.org/))
