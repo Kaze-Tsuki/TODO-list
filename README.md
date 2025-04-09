@@ -286,14 +286,14 @@ mingw32-make
 <details><summary>Add View Edit</summary>
 
 ```
-bui a b  
-add a task norm 1 task1 norm 0  
-add b task2 norm 0 task3 essential yes  
-prall a b  
-chg a 1 name task4  
-chg a 1 cate essential  
-chg b 1 comp 1  
-chgli a new_name  
+bui a b
+add a task norm 1 task1 norm 0
+add b task2 norm 0 task3 essential yes
+prall a b
+chg a 1 name task4
+chg a 1 cate essential
+chg b 1 comp 1
+chgli a new_name
 prall a b
 ```
 </details>
@@ -301,18 +301,18 @@ prall a b
 <details><summary>Copy Remove Special</summary>
 
 ```
-bui a  
-add a task1 norm 0  
-addsp a task2 norm 0 2023-10-01;1  
-addsp a task3 esse 0 2023-10-02;2  
-cpy a b  
-prall a b  
-rm a id 1  
-rm b cate norm  
-rm a name task2  
+bui a
+add a task1 norm 0
+addsp a task2 norm 0 2023-10-01;1
+addsp a task3 esse 0 2023-10-02;2
+cpy a b
+prall a b
+rm a id 1
+rm b cate norm
+rm a name task2
 swId b 1 2
-prall a b  
-rm a list  
+prall a b
+rm a list
 prall b a
 ```
 </details>
@@ -322,16 +322,16 @@ prall b a
 <details><summary>Store Load</summary>
 
 ```
-bui a  
-add a task1 norm 1 task2 norm 0 task3 esse 0  
-addsp a task4 esse 0 2023-10-01;1  
-addsp a task5 esse 1 2023-10-02;2  
+bui a
+add a task1 norm 1 task2 norm 0 task3 esse 0
+addsp a task4 esse 0 2023-10-01;1
+addsp a task5 esse 1 2023-10-02;2
 store test
 ```
 ***
 (start a new session)  
 ```
-load test  
+load test
 prall a
 ```
 </details>
@@ -339,17 +339,17 @@ prall a
 <details><summary>Sort Filter</summary>
 
 ```
-load test  
-sort a name 0  
-prall a  
-filter a cate esse b  
-prall b  
-sort b piority 1  
-prall b  
-filter a comp 1 c  
-prall c  
-sort a date 0  
-filter a date 2023-10-01 d  
+load test
+sort a name 0
+prall a
+filter a cate esse b
+prall b
+sort b piority 1
+prall b
+filter a comp 1 c
+prall c
+sort a date 0
+filter a date 2023-10-01 d
 prall a d
 ```
 </details>
@@ -357,15 +357,15 @@ prall a d
 <details><summary>Merge Intersect</summary>
 
 ```
-load test  
-bui b  
-add b task1 norm 1 task4 esse 1  
-addsp b task4 esse 0 2023-10-31;3  
-addsp b task5 esse 1 2023-10-02;2  
-store test  
-merge a b c  
-prall c  
-inter a b d  
+load test
+bui b
+add b task1 norm 1 task4 esse 1
+addsp b task4 esse 0 2023-10-31;3
+addsp b task5 esse 1 2023-10-02;2
+store test
+merge a b c
+prall c
+inter a b d
 prall d
 ```
 </details>
@@ -374,16 +374,16 @@ prall d
 <details><summary>Custom Command</summary>
 
 ```
-load test  
-define mycmd 4  
-merge 1 2 3  
-inter 1 2 4  
-prall 3 4  
-end  
-exec mycmd a b c d  
-usercmd  
-rmcmd mycmd  
-usercmd  
+load test
+define mycmd 4
+merge 1 2 3
+inter 1 2 4
+prall 3 4
+end
+exec mycmd a b c d
+usercmd
+rmcmd mycmd
+usercmd
 exit
 ```
 </details>
