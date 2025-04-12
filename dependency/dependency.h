@@ -17,7 +17,6 @@ protected:
 public:
     base_task(string name, string category, bool completed);
     base_task(const base_task &t);
-    virtual void print();
     virtual string to_commands(string& liname) const = 0;
     virtual void change_completed(bool ncompleted);
     virtual void change_name(string& name);

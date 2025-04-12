@@ -470,6 +470,7 @@ void cmd_sort()
         return;
     }
     it->sort(*type, *ascending);
+    it->printAll();
 }
 
 void cmd_filter()

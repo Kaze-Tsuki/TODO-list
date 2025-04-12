@@ -295,7 +295,8 @@ chg a 1 name task4
 chg a 1 cate essential
 chg b 1 comp 1
 chgli a new_name
-prall a b
+prall new_name b
+exit
 ```
 </details>
 
@@ -311,10 +312,12 @@ prall a b
 rm a id 1
 rm b cate norm
 rm a name task2
+add b task1 esse 0
 swId b 1 2
 prall a b
 rm a list
 prall b a
+exit
 ```
 </details>
 
@@ -328,12 +331,14 @@ add a task1 norm 1 task2 norm 0 task3 esse 0
 addsp a task4 esse 0 2023-10-01;1
 addsp a task5 esse 1 2023-10-02;2
 store test
+exit
 ```
 ***
 (start a new session)  
 ```
 load test
 prall a
+exit
 ```
 </details>
 
@@ -342,16 +347,13 @@ prall a
 ```
 load test
 sort a name 0
-prall a
 filter a cate esse b
-prall b
 sort b piority 1
-prall b
 filter a comp 1 c
-prall c
 sort a date 0
 filter a date 2023-10-01 d
 prall a d
+exit
 ```
 </details>
 
@@ -368,6 +370,7 @@ merge a b c
 prall c
 inter a b d
 prall d
+exit
 ```
 </details>
 

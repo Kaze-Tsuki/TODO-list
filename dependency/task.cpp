@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <sstream>
 #include <memory>
+#include <iomanip>
 
 using namespace std;
 
@@ -35,13 +36,6 @@ ostream &operator<<(ostream &os, base_task &t)
 {
     t.output(os);
     return os;
-}
-
-void base_task::print()
-{
-    cout << *name << '\t'
-        << *category << '\t'
-        << ((*completed == true)? "Yes" : "No") << "\t\n";
 }
 
 void base_task::change_completed(bool ncompleted)
@@ -95,9 +89,9 @@ bool norm_task::operator!=(base_task &t)
 
 void norm_task::output(ostream &os)
 {
-    os << *name << '\t'
-        << *category << "\t\t"
-        << ((*completed == true)? "Yes" : "No") << "\n";
+    os  << left << setw(12) << *name
+        << left << setw(18) << *category
+        << left << setw(12) << ((*completed == true)? "Yes" : "No") << "\n";
 }
 
 string norm_task::to_commands(string& liname) const
@@ -179,11 +173,11 @@ bool special_task::operator!=(base_task &t)
 
 void special_task::output(ostream &os)
 {
-    os << *name << '\t'
-        << *category << "\t\t"
-        << ((*completed == true)? "Yes" : "No") << "\t\t"
-        << *date << "\t\t"
-        << *piority << "\n";
+    os  << left << setw(12) << *name
+        << left << setw(18) << *category
+        << left << setw(12) << ((*completed == true)? "Yes" : "No")
+        << left << setw(15) << *date
+        << left << setw(10) << *piority << "\n";
 }
 
 string special_task::to_commands(string& liname) const

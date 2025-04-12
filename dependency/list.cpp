@@ -1,6 +1,7 @@
 #include "dependency.h"
 #include <algorithm>
 #include <typeinfo>
+#include <iomanip>
 
 using namespace std;
 
@@ -54,7 +55,13 @@ base_task* todos::get_task(int index)
     }
     return tasks->at(index);
 }
-
+/*
+<< setw(4) << "ID:"
+<< setw(15) << "Name"
+<< setw(20) << "Category"
+<< setw(10) << "Completed"
+<< setw(15) << "Date"
+<< setw(10) << "Piority" << "\n";*/
 void todos::printAll()
 {
     if(tasks->size() == 0)
@@ -62,10 +69,18 @@ void todos::printAll()
         cout << "No tasks\n";
         return;
     }
-    cout << "list: " << *name << "\nID:\tName\tCategory\tCompleted\tDate\t\t\tPiority\n";
+    cout << "list: " << *name << '\n'
+         << left << setw(4) << "ID:"
+         << left << setw(12) << "Name"
+         << left << setw(18) << "Category"
+         << left << setw(12) << "Completed"
+         << left << setw(15) << "Date"
+         << left << setw(10) << "Piority" << "\n";
+    cout << string(68, '-') << "\n";
+
     size_t* i = new size_t (0);
     for (; *i < tasks->size(); (*i)++)
-        cout << (*i)+1 << ":\t" << *tasks->at(*i);
+        cout << setw(4) << (*i)+1 << *tasks->at(*i);
     delete i;
 }
 
@@ -76,12 +91,17 @@ void todos::printtask(int id)
         cout << "Invalid ID\n";
         return;
     }
-    cout << "ID:\tName\tCategory\tCompleted";
+    cout << left << setw(4) << "ID:"
+         << left << setw(12) << "Name"
+         << left << setw(18) << "Category"
+         << left << setw(12) << "Completed";
     if (typeid(*tasks->at(id)) == typeid(special_task))
-        cout << "\tDate\t\t\tPiority\n";
+        cout << left << setw(15) << "Date"
+             << left << setw(10) << "Piority" << "\n"
+             << string(68, '-') << "\n";
     else
-        cout << "\n";
-    cout << id+1 << ":\t" << *(tasks->at(id));
+        cout << "\n" << string(43, '-') << "\n";
+    cout << setw(4) << id+1 << *(tasks->at(id));
 }
 
 void todos::switch_id(int index1, int index2)
