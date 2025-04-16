@@ -32,7 +32,7 @@ int main()
             break;
 
         else
-            processor(*cmd);
+            processor(cmd);
     }
 
     // Free memory

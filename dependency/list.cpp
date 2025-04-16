@@ -48,20 +48,14 @@ void todos::add_task(base_task *task)
 
 base_task* todos::get_task(int index)
 {
-    if (index < 0 || index >= tasks->size())
+    if (index < 0 || index >= (int)tasks->size())
     {
         cout << "Invalid ID\n";
         return nullptr;
     }
     return tasks->at(index);
 }
-/*
-<< setw(4) << "ID:"
-<< setw(15) << "Name"
-<< setw(20) << "Category"
-<< setw(10) << "Completed"
-<< setw(15) << "Date"
-<< setw(10) << "Piority" << "\n";*/
+
 void todos::printAll()
 {
     if(tasks->size() == 0)
@@ -84,9 +78,9 @@ void todos::printAll()
     delete i;
 }
 
-void todos::printtask(int id)
+void todos::printtask(int* id)
 {
-    if (id < 0 || id >= tasks->size())
+    if (*id < 0 || *id >= (int)tasks->size())
     {
         cout << "Invalid ID\n";
         return;
@@ -95,110 +89,110 @@ void todos::printtask(int id)
          << left << setw(12) << "Name"
          << left << setw(18) << "Category"
          << left << setw(12) << "Completed";
-    if (typeid(*tasks->at(id)) == typeid(special_task))
+    if (typeid(*tasks->at(*id)) == typeid(special_task))
         cout << left << setw(15) << "Date"
              << left << setw(10) << "Piority" << "\n"
              << string(68, '-') << "\n";
     else
         cout << "\n" << string(43, '-') << "\n";
-    cout << setw(4) << id+1 << *(tasks->at(id));
+    cout << setw(4) << id+1 << *(tasks->at(*id));
 }
 
-void todos::switch_id(int index1, int index2)
+void todos::switch_id(int* index1, int* index2)
 {
-    if(index1 < 0 || index1 >= tasks->size() || index2 < 0 || index2 >= tasks->size())
+    if(*index1 < 0 || *index1 >= (int)tasks->size() || *index2 < 0 || *index2 >= (int)tasks->size())
     {
         cout << "Invalid ID\n";
         return;
     }
-    swap(tasks->at(index1), tasks->at(index2));
+    swap(tasks->at(*index1), tasks->at(*index2));
     // cout << "Switch " << index1+1 << " and " << index2+1 << " completed\n";
 }
 
-void todos::rm_taskWid(int index)
+void todos::rm_taskWid(int* index)
 {
-    if (index < 0 || index >= tasks->size())
+    if (*index < 0 || *index >= (int)tasks->size())
     {
         cout << "Invalid ID\n";
         return;
     }
-    delete tasks->at(index);
-    tasks->erase(tasks->begin() + index);
+    delete tasks->at(*index);
+    tasks->erase(tasks->begin() + *index);
 }
 
-void todos::rm_taskWname(string name)
+void todos::rm_taskWname(string* name)
 {
-    size_t* i = new size_t (0);
-    for (; *i < tasks->size(); (*i)++)
-        if (tasks->at(*i)->get_name() == name)
+    int* i = new int (0);
+    for (; *i < (int)tasks->size(); (*i)++)
+        if (tasks->at(*i)->get_name() == *name)
         {
-            rm_taskWid((*i)--);
+            rm_taskWid(i);(*i)--;
         }
     delete i;
 }
 
-void todos::rm_taskWcate(string category)
+void todos::rm_taskWcate(string* category)
 {
-    size_t* i = new size_t (0);
-    for (; *i < tasks->size(); (*i)++)
-        if (tasks->at(*i)->get_category() == category)
+    int* i = new int (0);
+    for (; *i < (int)tasks->size(); (*i)++)
+        if (tasks->at(*i)->get_category() == *category)
         {
-            rm_taskWid((*i)--);
+            rm_taskWid(i);(*i)--;
         }
     delete i;
 }
 
-void todos::sort(const string type, const bool ascending)
+void todos::sort(const string* type, const bool* ascending)
 {
-    cout << "Sorting by " << type << " in " << (ascending ? "ascending" : "descending") << " order\n";
+    cout << "Sorting by " << *type << " in " << (*ascending ? "ascending" : "descending") << " order\n";
 
-    if (type == "name")
+    if (*type == "name")
     {
         std::sort(tasks->begin(), tasks->end(), [ascending](base_task* a, base_task* b) {
-            return ascending ? *a < *b : *a > *b;
+            return *ascending ? *a < *b : *a > *b;
         });
     }
-    else if (type == "cate")
+    else if (*type == "cate")
     {
         std::sort(tasks->begin(), tasks->end(), [ascending](base_task* a, base_task* b) {
-            return ascending ? a->get_category() < b->get_category() : a->get_category() > b->get_category();
+            return *ascending ? a->get_category() < b->get_category() : a->get_category() > b->get_category();
         });
     }
-    else if (type == "comp")
+    else if (*type == "comp")
     {
         std::sort(tasks->begin(), tasks->end(), [ascending](base_task* a, base_task* b) {
-            return ascending ? a->get_completed() < b->get_completed() : a->get_completed() > b->get_completed();
+            return *ascending ? a->get_completed() < b->get_completed() : a->get_completed() > b->get_completed();
         });
     }
-    else if (type == "piority")
+    else if (*type == "piority")
     {
         std::sort(tasks->begin(), tasks->end(), [ascending](base_task* a, base_task* b) {
             special_task* st1 = dynamic_cast<special_task*>(a);
             special_task* st2 = dynamic_cast<special_task*>(b);
             if (st1 == nullptr)
-                return ascending;
+                return *ascending;
             if (st2 == nullptr)
-                return !ascending;
-            return ascending ? st1->get_piority() < st2->get_piority() : st1->get_piority() > st2->get_piority();
+                return !*ascending;
+            return *ascending ? st1->get_piority() < st2->get_piority() : st1->get_piority() > st2->get_piority();
         });
     }
-    else if (type == "date")
+    else if (*type == "date")
     {
         std::sort(tasks->begin(), tasks->end(), [ascending](base_task* a, base_task* b) {
             special_task* st1 = dynamic_cast<special_task*>(a);
             special_task* st2 = dynamic_cast<special_task*>(b);
             if (st1 == nullptr)
-                return ascending;
+                return *ascending;
             if (st2 == nullptr)
-                return !ascending;
-            return ascending ? st1->get_date() < st2->get_date() : st1->get_date() > st2->get_date();
+                return !*ascending;
+            return *ascending ? st1->get_date() < st2->get_date() : st1->get_date() > st2->get_date();
         });
     }
-    else if (type == "default")
+    else if (*type == "default")
     {
         // name -> category -> completed
         std::sort(tasks->begin(), tasks->end(), [ascending](base_task* a, base_task* b) {
-            if (ascending)
+            if (*ascending)
             {
                 if (*a < *b) return true;
                 else if (*a > *b) return false;

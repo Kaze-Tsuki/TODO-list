@@ -45,7 +45,7 @@ void cmd_sort();
 void cmd_filter();
 void cmd_clear();
 void cmd_ls();
-void processor(string& cmd);
+void processor(string* cmd);
 void delete_cmd();
 void customize_cmd();
 void execute_cmd();
@@ -65,101 +65,101 @@ int find_id_by_name(list<todos> &li, string &name)
     return -1;
 }
 
-void processor(string& cmd)
+void processor(string* cmd)
 {
     ss->clear();
-    ss->str(cmd);
-    *ss >> cmd;
+    ss->str(*cmd);
+    *ss >> *cmd;
 
-    if (cmd == "help")
+    if (*cmd == "help")
     {
         cmd_help();
     }
-    else if (cmd == "build_li" || cmd == "bui")
+    else if (*cmd == "build_li" || *cmd == "bui")
     {
         cmd_build_li();
     }
-    else if (cmd == "add")
+    else if (*cmd == "add")
     {
         cmd_add();
     }
-    else if (cmd == "addsp")
+    else if (*cmd == "addsp")
     {
         cmd_addsp();
     }
-    else if (cmd == "pr")
+    else if (*cmd == "pr")
     {
         cmd_pr();
     }
-    else if (cmd == "prall")
+    else if (*cmd == "prall")
     {
         cmd_prall();
     }
-    else if (cmd == "swId")
+    else if (*cmd == "swId")
     {
         cmd_swId();
     }
-    else if (cmd == "cpy")
+    else if (*cmd == "cpy")
     {
         cmd_cpy();
     }
-    else if (cmd == "merge")
+    else if (*cmd == "merge")
     {
         cmd_merge();
     }
-    else if (cmd == "inter")
+    else if (*cmd == "inter")
     {
         cmd_inter();
     }
-    else if (cmd == "chg")
+    else if (*cmd == "chg")
     {
         cmd_chg();
     }
-    else if (cmd == "chgli")
+    else if (*cmd == "chgli")
     {
         cmd_chgli();
     }
-    else if (cmd == "rm")
+    else if (*cmd == "rm")
     {
         cmd_rm();
     }
-    else if (cmd == "sort")
+    else if (*cmd == "sort")
     {
         cmd_sort();
     }
-    else if (cmd == "filter")
+    else if (*cmd == "filter")
     {
         cmd_filter();
     }
-    else if (cmd == "ls")
+    else if (*cmd == "ls")
     {
         cmd_ls();
     }
-    else if (cmd == "clear")
+    else if (*cmd == "clear")
     {
         cmd_clear();
     }
-    else if (cmd == "define")
+    else if (*cmd == "define")
     {
         customize_cmd();
     }
-    else if (cmd == "exec")
+    else if (*cmd == "exec")
     {
         execute_cmd();
     }
-    else if (cmd == "rmcmd")
+    else if (*cmd == "rmcmd")
     {
         delete_cmd();
     }
-    else if (cmd == "usercmd")
+    else if (*cmd == "usercmd")
     {
         cmd_userdefined();
     }
-    else if (cmd == "store")
+    else if (*cmd == "store")
     {
         cmd_store();
     }
-    else if (cmd == "load")
+    else if (*cmd == "load")
     {
         cmd_load();
     }
@@ -225,7 +225,9 @@ void cmd_add()
     while (*ss >> *name)
     {
         *ss >> *category >> *completed;
-        it->add_task(new norm_task(*name, *category, *completed == "1" || *completed == "yes"));
+        bool* is_comp = new bool(*completed == "1" || *completed == "yes");
+        it->add_task(new norm_task(name, category, is_comp));
+        delete is_comp; // 釋放記憶體
     }
 }
 
@@ -239,7 +241,9 @@ void cmd_addsp()
         return;
     }
     *ss >> *name >> *category >> *completed >> *value;
-    it->add_task(new special_task(*name, *category, *completed == "1" || *completed == "yes", *value));
+    bool* is_comp = new bool(*completed == "1" || *completed == "yes");
+    it->add_task(new special_task(name, category, is_comp, value));
+    delete is_comp; // 釋放記憶體
     
 }
 
@@ -253,7 +257,8 @@ void cmd_pr()
         return;
     }
     *ss >> *task_id;
-    it->printtask(*task_id - 1);
+    *task_id -= 1;
+    it->printtask(task_id);
 }
 
 void cmd_prall()
@@ -280,7 +285,8 @@ void cmd_swId()
         return;
     }
     *ss >> *index1 >> *index2;
-    it->switch_id(*index1 - 1, *index2 - 1);
+    *index1 -= 1; *index2 -= 1;
+    it->switch_id(index1, index2);
 }
 
 void cmd_cpy()
@@ -442,17 +448,18 @@ void cmd_rm()
     else if (*type == "id")
     {
         *ss >> *task_id;
-        it->rm_taskWid(*task_id - 1);
+        *task_id -= 1;
+        it->rm_taskWid(task_id);
     }
     else if (*type == "name")
     {
         *ss >> *value;
-        it->rm_taskWname(*value);
+        it->rm_taskWname(value);
     }
     else if (*type == "cate")
     {
         *ss >> *value;
-        it->rm_taskWcate(*value);
+        it->rm_taskWcate(value);
     }
     else
     {
@@ -469,7 +476,7 @@ void cmd_sort()
         cout << "Invalid list name\n";
         return;
     }
-    it->sort(*type, *ascending);
+    it->sort(type, ascending);
     it->printAll();
 }
 
@@ -545,7 +552,7 @@ void customize_cmd()
     getline(*ss, *liname);
     try
     {
-        customs->emplace_back(*liname); // Use emplace_back to construct in-place
+        customs->emplace_back(liname); // Use emplace_back to construct in-place
         cout << "Custom command created\n";
     }
     catch(const std::exception& e)
@@ -569,23 +576,31 @@ void execute_cmd()
         {
             if (custom.get_name() == *cmd)
             {
-                string *line = custom.execute(*args);
+                string *line = custom.execute(args);
                 stringstream *result = new stringstream(*line);
                 delete line; // 釋放記憶體
                 line = new string();
                 while (getline(*result, *line))
                 {
                     cout << *line << '\n';
-                    processor(*line);
+                    processor(line);
                 }
+                delete result; // 釋放記憶體
+                delete arg; // 釋放記憶體
+                delete args; // 釋放記憶體
+                delete line; // 釋放記憶體
                 return;
             }
         }
+        delete arg; // 釋放記憶體
+        delete args; // 釋放記憶體
         cout << "Command not found\n";
     }
     catch(const std::exception& e)
     {
         std::cerr << e.what() << '\n';
+        delete arg; // 釋放記憶體
+        delete args; // 釋放記憶體
     }
 }
 
@@ -634,7 +649,7 @@ void cmd_load()
     string* line = new string();
     while (getline(*file, *line))
     {
-        processor(*line);
+        processor(line);
     }
     file->close();
     delete file;

@@ -6,28 +6,28 @@
 
 using namespace std;
 
-base_task::base_task(string name, string category, bool completed)
+base_task::base_task(string* name, string* category, bool* completed)
 {
-    this->name = new string(name);
-    this->category = new string(category);
-    this->completed = new bool(completed);
+    this->name = new string(*name);
+    this->category = new string(*category);
+    this->completed = new bool(*completed);
 }
 
-base_task::base_task(const base_task &t)
+base_task::base_task(const base_task *t)
 {
-    name = new string(*t.name);
-    category = new string(*t.category);
-    completed = new bool(*t.completed);
+    name = new string(*t->name);
+    category = new string(*t->category);
+    completed = new bool(*t->completed);
 }
 
-norm_task::norm_task(string name, string category, bool completed) : base_task(name, category, completed)
+norm_task::norm_task(string* name, string* category, bool* completed) : base_task(name, category, completed)
 {}
-norm_task::norm_task(const base_task &t) : base_task(t)
+norm_task::norm_task(const base_task *t) : base_task(t)
 {}
 
 base_task* norm_task::clone() const
 {
-    return new norm_task(*this);
+    return new norm_task(this);
 }
 
 
@@ -99,11 +99,11 @@ string norm_task::to_commands(string& liname) const
     return "add "+ liname+ " " + *name + " " + *category + " " + (*completed == true ? "1" : "0");
 }
 
-special_task::special_task(string name, string category, bool completed, string left)
+special_task::special_task(string* name, string* category, bool* completed, string* left)
 : base_task(name, category, completed)
 {
     // parse yyyy/mm/dd;p
-    unique_ptr<stringstream> ss(new stringstream(left));
+    unique_ptr<stringstream> ss(new stringstream(*left));
     unique_ptr<string> ldate(new string);
     unique_ptr<string> lpiority(new string);
     getline(*ss, *ldate, ';');
@@ -122,10 +122,10 @@ special_task::special_task(string name, string category, bool completed, string 
     }
 }
 
-special_task::special_task(const special_task &t) : base_task(t)
+special_task::special_task(const special_task *t) : base_task(t)
 {
-    date = new string(*t.date);
-    piority = new int(*t.piority);
+    date = new string(*t->date);
+    piority = new int(*t->piority);
 }
 
 special_task::~special_task()
@@ -135,7 +135,7 @@ special_task::~special_task()
 }
 base_task* special_task::clone() const
 {
-    return new special_task(*this);
+    return new special_task(this);
 }
 
 void special_task::change_date(string& ndate)

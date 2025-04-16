@@ -15,8 +15,8 @@ protected:
     string *category;
     bool *completed;
 public:
-    base_task(string name, string category, bool completed);
-    base_task(const base_task &t);
+    base_task(string* name, string* category, bool* completed);
+    base_task(const base_task *t);
     virtual string to_commands(string& liname) const = 0;
     virtual void change_completed(bool ncompleted);
     virtual void change_name(string& name);
@@ -38,8 +38,8 @@ public:
 class norm_task : public base_task
 {
 public:
-    norm_task(string name, string category, bool completed);
-    norm_task(const base_task &t);
+    norm_task(string* name, string* category, bool* completed);
+    norm_task(const base_task *t);
     virtual bool operator<(base_task &t) override;
     virtual bool operator>(base_task &t) override;
     virtual bool operator==(base_task &t) override;
@@ -55,8 +55,8 @@ protected:
     string *date;
     int *piority;
 public:
-    special_task(string name, string category, bool completed, string left);
-    special_task(const special_task &t);
+    special_task(string* name, string* category, bool* completed, string* left);
+    special_task(const special_task *t);
     virtual base_task* clone() const override;
     virtual bool operator<(base_task &t) override;
     virtual bool operator>(base_task &t) override;
@@ -85,12 +85,12 @@ public:
     void add_task(base_task *task);
     base_task* get_task(int index);
     void printAll();
-    void printtask(int index);
-    void switch_id(int index1, int index2);
-    void rm_taskWid(int index);
-    void rm_taskWname(string name);
-    void rm_taskWcate(string category);
-    void sort(const string type, const bool ascending);
+    void printtask(int* index);
+    void switch_id(int* index1, int* index2);
+    void rm_taskWid(int* index);
+    void rm_taskWname(string* name);
+    void rm_taskWcate(string* category);
+    void sort(const string* type, const bool* ascending);
     todos* filter(const string type, const string category);
     void clear();
     todos* merge(todos &l);
