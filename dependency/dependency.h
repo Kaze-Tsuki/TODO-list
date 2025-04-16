@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <set>
+#include <list>
 
 using namespace std;
 
@@ -17,10 +18,10 @@ protected:
 public:
     base_task(string* name, string* category, bool* completed);
     base_task(const base_task *t);
-    virtual string to_commands(string& liname) const = 0;
-    virtual void change_completed(bool ncompleted);
-    virtual void change_name(string& name);
-    virtual void change_category(string& category);
+    virtual string to_commands(string* liname) const = 0;
+    virtual void change_completed(bool* ncompleted);
+    virtual void change_name(string* name);
+    virtual void change_category(string* category);
     virtual bool get_completed();
     virtual string get_name();
     virtual string get_category();
@@ -30,7 +31,7 @@ public:
     virtual bool operator==(base_task &t) = 0;
     virtual bool operator!=(base_task &t) = 0;
     friend ostream &operator<<(ostream &os, base_task &t);
-    virtual void output(ostream &os) = 0;
+    virtual void output(ostream* os) = 0;
     virtual base_task* clone() const = 0; // Pure virtual function for cloning
     virtual ~base_task();
 };
@@ -45,8 +46,8 @@ public:
     virtual bool operator==(base_task &t) override;
     virtual bool operator!=(base_task &t) override;
     virtual base_task* clone() const override;
-    virtual void output(ostream &os) override;
-    virtual string to_commands(string& liname) const override;
+    virtual void output(ostream* os) override;
+    virtual string to_commands(string* liname) const override;
 };
 
 class special_task : public base_task
@@ -62,13 +63,13 @@ public:
     virtual bool operator>(base_task &t) override;
     virtual bool operator==(base_task &t) override;
     virtual bool operator!=(base_task &t) override;
-    void change_date(string& date);
-    void change_piority(int piority);
+    void change_date(string* date);
+    void change_piority(int* npiority);
     string get_date();
     int get_piority();
     ~special_task();
-    virtual void output(ostream &os) override;
-    virtual string to_commands(string& liname) const override;
+    virtual void output(ostream* os) override;
+    virtual string to_commands(string* liname) const override;
 };
 
 class todos
@@ -77,13 +78,14 @@ protected:
     vector <base_task*>* tasks;
     string* name;
 public:
-    todos(string name);
-    todos(const todos &l);
-    todos(const string name, const todos &l);
+    todos(string* name);
+    todos(const todos* l);
+    // todos(const string name, const todos &l);
+    todos(const string* name, list<todos>::iterator &l);
     string& get_name();
     void change_name(string* name);
     void add_task(base_task *task);
-    base_task* get_task(int index);
+    base_task* get_task(int* index);
     void printAll();
     void printtask(int* index);
     void switch_id(int* index1, int* index2);
@@ -91,10 +93,10 @@ public:
     void rm_taskWname(string* name);
     void rm_taskWcate(string* category);
     void sort(const string* type, const bool* ascending);
-    todos* filter(const string type, const string category);
+    todos* filter(const string* type, const string* category);
     void clear();
-    todos* merge(todos &l);
-    todos* inter(todos &l);
+    todos* merge(list<todos>::iterator& l);
+    todos* inter(list<todos>::iterator& l);
     string to_commands();
 
     ~todos();

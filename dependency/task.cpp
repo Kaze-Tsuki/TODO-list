@@ -34,18 +34,18 @@ base_task* norm_task::clone() const
 
 ostream &operator<<(ostream &os, base_task &t)
 {
-    t.output(os);
+    t.output(&os);
     return os;
 }
 
-void base_task::change_completed(bool ncompleted)
+void base_task::change_completed(bool* ncompleted)
 {*completed = ncompleted;}
 
-void base_task::change_name(string& nname)
-{*name = nname;}
+void base_task::change_name(string* nname)
+{*name = *nname;}
 
-void base_task::change_category(string& ncategory)
-{*category = ncategory;}
+void base_task::change_category(string* ncategory)
+{*category = *ncategory;}
 
 bool base_task::get_completed()
 {return *completed;}
@@ -87,16 +87,16 @@ bool norm_task::operator!=(base_task &t)
     return (*name != *(nt->name) || *category != *(nt->category) || *completed != *(nt->completed));
 }
 
-void norm_task::output(ostream &os)
+void norm_task::output(ostream* os)
 {
-    os  << left << setw(12) << *name
+    *os  << left << setw(12) << *name
         << left << setw(18) << *category
         << left << setw(12) << ((*completed == true)? "Yes" : "No") << "\n";
 }
 
-string norm_task::to_commands(string& liname) const
+string norm_task::to_commands(string* liname) const
 {
-    return "add "+ liname+ " " + *name + " " + *category + " " + (*completed == true ? "1" : "0");
+    return "add "+ *liname+ " " + *name + " " + *category + " " + (*completed == true ? "1" : "0");
 }
 
 special_task::special_task(string* name, string* category, bool* completed, string* left)
@@ -138,10 +138,10 @@ base_task* special_task::clone() const
     return new special_task(this);
 }
 
-void special_task::change_date(string& ndate)
-{*date = ndate;}
-void special_task::change_piority(int npiority)
-{*piority = npiority;}
+void special_task::change_date(string* ndate)
+{*date = *ndate;}
+void special_task::change_piority(int* npiority)
+{*piority = *npiority;}
 
 string special_task::get_date()
 {return *date;}
@@ -171,16 +171,16 @@ bool special_task::operator!=(base_task &t)
     return (*name != *(st->name) || *category != *(st->category) || *completed != *(st->completed) || *date != *(st->date) || *piority != *(st->piority));
 }
 
-void special_task::output(ostream &os)
+void special_task::output(ostream* os)
 {
-    os  << left << setw(12) << *name
+    *os  << left << setw(12) << *name
         << left << setw(18) << *category
         << left << setw(12) << ((*completed == true)? "Yes" : "No")
         << left << setw(15) << *date
         << left << setw(10) << *piority << "\n";
 }
 
-string special_task::to_commands(string& liname) const
+string special_task::to_commands(string* liname) const
 {
-    return "addsp "+ liname+ " " + *name + " " + *category + " " + (*completed == true ? "1" : "0") + " " + *date + ";" + to_string(*piority);
+    return "addsp "+ *liname+ " " + *name + " " + *category + " " + (*completed == true ? "1" : "0") + " " + *date + ";" + to_string(*piority);
 }

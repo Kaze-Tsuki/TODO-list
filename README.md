@@ -308,6 +308,7 @@ add a task1 norm 0
 addsp a task2 norm 0 2023-10-01;1
 addsp a task3 esse 0 2023-10-02;2
 cpy a b
+chg b 2 piority 10
 prall a b
 rm a id 1
 rm b cate norm
@@ -351,7 +352,7 @@ filter a cate esse b
 sort b piority 1
 filter a comp 1 c
 sort a date 0
-filter a date 2023-10-01 d
+filter a date b2023-10-01 d
 prall a d
 exit
 ```
@@ -382,7 +383,6 @@ load test
 define mycmd 4
 merge 1 2 3
 inter 1 2 4
-prall 3 4
 end
 exec mycmd a b c d
 usercmd

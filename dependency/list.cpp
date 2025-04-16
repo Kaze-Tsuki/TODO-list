@@ -2,28 +2,37 @@
 #include <algorithm>
 #include <typeinfo>
 #include <iomanip>
+#include <list>
 
 using namespace std;
 
-todos::todos(string name)
+todos::todos(string* name)
 {
-    this->name = new string(name);
+    this->name = new string(*name);
     tasks = new vector<base_task*>;
 }
 
-todos::todos(const todos &l)
+todos::todos(const todos* l)
 {
-    name = new string(*l.name);
+    name = new string(*l->name);
     tasks = new vector<base_task*>();
-    for (auto iter = l.tasks->begin(); iter != l.tasks->end(); ++iter)
+    for (auto iter = l->tasks->begin(); iter != l->tasks->end(); ++iter)
         tasks->emplace_back((*iter)->clone());
 }
 
-todos::todos(const string name, const todos &l)
+// todos::todos(const string name, const todos &l)
+// {
+//     this->name = new string(name);
+//     tasks = new vector<base_task*>;
+//     for (auto iter = l.tasks->begin(); iter != l.tasks->end(); ++iter)
+//         tasks->emplace_back((*iter)->clone());
+// }
+
+todos::todos(const string* name, list<todos>::iterator &l)
 {
-    this->name = new string(name);
+    this->name = new string(*name);
     tasks = new vector<base_task*>;
-    for (auto iter = l.tasks->begin(); iter != l.tasks->end(); ++iter)
+    for (auto iter = l->tasks->begin(); iter != l->tasks->end(); ++iter)
         tasks->emplace_back((*iter)->clone());
 }
 
@@ -46,14 +55,14 @@ void todos::add_task(base_task *task)
     tasks->emplace_back(task);
 }
 
-base_task* todos::get_task(int index)
+base_task* todos::get_task(int* index)
 {
-    if (index < 0 || index >= (int)tasks->size())
+    if (*index < 0 || *index >= (int)tasks->size())
     {
         cout << "Invalid ID\n";
         return nullptr;
     }
-    return tasks->at(index);
+    return tasks->at(*index);
 }
 
 void todos::printAll()
@@ -216,35 +225,37 @@ void todos::sort(const string* type, const bool* ascending)
     }
 }
 
-todos* todos::filter(const string type, const string category)
+todos* todos::filter(const string* type, const string* category)
 {
-    todos* temp = new todos(*this->name + "-" + category);
-    if (type == "cate")
+    string* temp_name = new string(*name + "-" + *category);
+    todos* temp = new todos(temp_name);
+    delete temp_name;
+    if (*type == "cate")
     {
         for (auto& task : *tasks)
-            if (task->get_category() == category)
+            if (task->get_category() == *category)
                 temp->add_task(task->clone());
     }
-    else if (type == "comp")
+    else if (*type == "comp")
     {
         for (auto& task : *tasks)
-            if (task->get_completed() == (category == "1" || category == "yes"))
+            if (task->get_completed() == (*category == "1" || *category == "yes"))
                 temp->add_task(task->clone());
     }
-    else if (type == "name")
+    else if (*type == "name")
     {
         for (auto& task : *tasks)
-            if (task->get_name() == category)
+            if (task->get_name() == *category)
                 temp->add_task(task->clone());
     }
-    else if (type == "date")
+    else if (*type == "date")
     {
-        bool *bigger = new bool(category[0] == 'b');
+        bool *bigger = new bool((*category)[0] == 'b');
         string *date;
-        if (isdigit(category[0]))
-            date = new string(category);
+        if (isdigit((*category)[0]))
+            date = new string(*category);
         else
-            date = new string(category.substr(1));
+            date = new string(category->substr(1));
         for (auto& task : *tasks)
         {
             special_task* st = dynamic_cast<special_task*>(task);
@@ -256,15 +267,15 @@ todos* todos::filter(const string type, const string category)
         delete bigger;
         delete date;
     }
-    else if (type == "piority")
+    else if (*type == "piority")
     {
-        bool *bigger = new bool(category[0] == 'b');
+        bool *bigger = new bool((*category)[0] == 'b');
         int *piority;
         try{
-            if (isdigit(category[0]))
-                piority = new int(stoi(category));
+            if (isdigit((*category)[0]))
+                piority = new int(stoi(*category));
             else
-                piority = new int(stoi(category.substr(1)));
+                piority = new int(stoi(category->substr(1)));
         }
         catch (const invalid_argument& e) {
             cout << "invalid argument for piority" << endl;
@@ -301,22 +312,26 @@ void todos::clear()
 
 }
 
-todos* todos::merge(todos &l)
+todos* todos::merge(list<todos>::iterator& l)
 {
-    todos* temp = new todos(*name + "-" + *l.name);
+    string* temp_name = new string(*this->name + "-" + *l->name);
+    todos* temp = new todos(temp_name);
+    delete temp_name;
     for (auto it1 = tasks->begin(); it1 != tasks->end(); ++it1)
         temp->add_task((*it1)->clone()); // 複製當前清單的任務
-    for (auto it2 = l.tasks->begin(); it2 != l.tasks->end(); ++it2)
+    for (auto it2 = l->tasks->begin(); it2 != l->tasks->end(); ++it2)
         temp->add_task((*it2)->clone()); // 複製要合併的清單的任務
 
     return temp; // 返回合併後的 todos
 }
 
-todos* todos::inter(todos &l)
+todos* todos::inter(list<todos>::iterator& l)
 {
-    todos* temp = new todos(*name + "-" + *l.name);
+    string* temp_name = new string(*this->name + "-" + *l->name);
+    todos* temp = new todos(temp_name);
+    delete temp_name;
     for (auto it1 = tasks->begin(); it1 != tasks->end(); ++it1)
-        for (auto it2 = l.tasks->begin(); it2 != l.tasks->end(); ++it2)
+        for (auto it2 = l->tasks->begin(); it2 != l->tasks->end(); ++it2)
             if (**it1 == **it2)
                 temp->add_task((*it1)->clone());
     return temp;
@@ -328,7 +343,7 @@ string todos::to_commands()
     *s = "bui " + *name + "\n";
     for (auto &task : *tasks)
     {
-        *s += task->to_commands(*name) + "\n";
+        *s += task->to_commands(name) + "\n";
     }
     return *s;
 }

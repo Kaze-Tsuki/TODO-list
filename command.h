@@ -208,7 +208,7 @@ void cmd_build_li()
                 return;
             }
         }
-        li->emplace_back(*name); // 使用 emplace_back 直接在容器中構造物件
+        li->emplace_back(name); // 使用 emplace_back 直接在容器中構造物件
         cout << "built list " << *name << '\n';
     }
 }
@@ -306,7 +306,7 @@ void cmd_cpy()
             return;
         }
     }
-    li->emplace_back(*name, *it);
+    li->emplace_back(name, it);
     cout << "copied list " << *name << '\n';
 }
 
@@ -330,7 +330,7 @@ void cmd_merge()
             return;
         }
     }
-    li->emplace_back(*(it1->merge(*it2)));
+    li->emplace_back((it1->merge(it2)));
     li->back().change_name(name);
     cout << "merged list " << *name << '\n';
     li->back().printAll();
@@ -356,7 +356,7 @@ void cmd_inter()
             return;
         }
     }
-    li->emplace_back(*(it1->inter(*it2)));
+    li->emplace_back((it1->inter(it2)));
     li->back().change_name(name);
     cout << "intersected list " << *name << '\n';
     li->back().printAll();
@@ -365,6 +365,7 @@ void cmd_inter()
 void cmd_chg()
 {
     *ss >> *liname >> *task_id >> *type >> *value;
+    *task_id -= 1;
     auto it = find_if(li->begin(), li->end(), [&](todos &l) { return l.get_name() == *liname; });
     if (it == li->end())
     {
@@ -373,21 +374,23 @@ void cmd_chg()
     }
     if (*type == "name")
     {
-        it->get_task(*task_id - 1)->change_name(*value);
+        it->get_task(task_id)->change_name(value);
     }
     else if (*type == "cate")
     {
-        it->get_task(*task_id - 1)->change_category(*value);
+        it->get_task(task_id)->change_category(value);
     }
     else if (*type == "comp")
     {
-        it->get_task(*task_id - 1)->change_completed(*value == "1");
+        bool* is_comp = new bool(*value == "1" || *value == "yes");
+        it->get_task(task_id)->change_completed(is_comp);
+        delete is_comp; // 釋放記憶體
     }
     else if (*type == "date")
     {
-        if (typeid(*it->get_task(*task_id - 1)) == typeid(special_task))
+        if (typeid(*it->get_task(task_id)) == typeid(special_task))
         {
-            (dynamic_cast<special_task*>(it->get_task(*task_id - 1)))->change_date(*value);
+            (dynamic_cast<special_task*>(it->get_task(task_id)))->change_date(value);
         }
         else
         {
@@ -396,9 +399,11 @@ void cmd_chg()
     }
     else if (*type == "piority")
     {
-        if (typeid(*it->get_task(*task_id - 1)) == typeid(special_task))
+        if (typeid(*it->get_task(task_id)) == typeid(special_task))
         {
-            (dynamic_cast<special_task*>(it->get_task(*task_id - 1)))->change_piority(stoi(*value));
+            int* piority = new int(stoi(*value));
+            (dynamic_cast<special_task*>(it->get_task(task_id)))->change_piority(piority);
+            delete piority; // 釋放記憶體
         }
         else
         {
@@ -490,13 +495,13 @@ void cmd_filter()
         cout << "Invalid list name\n";
         return;
     }
-    auto temp = it->filter(*type, *category);
+    auto temp = it->filter(type, category);
     if (temp == nullptr)
     {
         delete temp;
         return;
     }
-    li->emplace_back(*temp);
+    li->emplace_back(temp);
     delete temp; // 釋放記憶體
     if (*name != "")
         li->back().change_name(name);
