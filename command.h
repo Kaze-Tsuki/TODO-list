@@ -498,7 +498,6 @@ void cmd_filter()
     auto temp = it->filter(type, category);
     if (temp == nullptr)
     {
-        delete temp;
         return;
     }
     li->emplace_back(temp);
