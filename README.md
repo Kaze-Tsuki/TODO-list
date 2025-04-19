@@ -20,9 +20,9 @@
 ## Catalog
 
 - [Command Summary](#cs)
-- [data structure](#ds)
-- [how to run](#compile)
-- [test cases](#tc)
+- [Data Structure](#ds)
+- [How to Run](#compile)
+- [Test Cases](#tc)
 
 <h2 id = "cs">Command Summary </h2>
 
@@ -183,7 +183,7 @@ load all lists from a file.
 
 <h2 id = "ds">Data Structure</h2>
 
-### List
+### Todo List
 
 Store a list of tasks.
 ```cpp
@@ -216,7 +216,7 @@ class Task {
 
 `piority` and `date` are attributes of special tasks.
 
-### List<todo>
+### List of Todo List
 Using list for vector can't store class of pointers.
 
 I fix the leak bug for 6 hours and find that vector doesn't fit the object, so use list instead.
