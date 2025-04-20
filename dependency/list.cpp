@@ -279,6 +279,7 @@ todos* todos::filter(const string* type, const string* category)
         }
         catch (const invalid_argument& e) {
             cout << "invalid argument for piority" << endl;
+            delete bigger;
             return nullptr;
         }
         for (auto& task : *tasks)

@@ -580,7 +580,8 @@ void execute_cmd()
         {
             if (custom.get_name() == *cmd)
             {
-                string *line = custom.execute(args);
+                string *line = custom.execute(args); // exception will be thrown if args.size() != custom.get_numParams()
+                // so no delete problems
                 stringstream *result = new stringstream(*line);
                 delete line; // 釋放記憶體
                 line = new string();
